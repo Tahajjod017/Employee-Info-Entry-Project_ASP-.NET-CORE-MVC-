@@ -13,7 +13,7 @@ namespace EmployeeMvc.Models
         public string? Email { get; set; }
         public int Designation { get; set; }
         public int GrossSalary { get; set; }
-        public string Phone {  get; set; }
+        public string? Phone {  get; set; }
         public string Photo {  get; set; }
 
     }
