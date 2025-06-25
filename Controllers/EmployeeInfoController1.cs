@@ -46,6 +46,7 @@ namespace EmployeeMvc.Controllers
             return View(employee);
 
         }
+        [HttpPost]
         public async Task<IActionResult> Save(Employeeinfo employee)
         {
             if (ModelState.IsValid)
