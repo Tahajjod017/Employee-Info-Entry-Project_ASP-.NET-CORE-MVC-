@@ -24,11 +24,8 @@ namespace EmployeeMvc.Migrations
 
             modelBuilder.Entity("EmployeeMvc.Models.Department", b =>
                 {
-                    b.Property<int>("DepartmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartmentId"));
+                    b.Property<string>("DepartmentId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DepartmentName")
                         .IsRequired()
@@ -42,16 +39,17 @@ namespace EmployeeMvc.Migrations
 
             modelBuilder.Entity("EmployeeMvc.Models.Designation", b =>
                 {
-                    b.Property<int>("DesignationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DesignationId"));
+                    b.Property<string>("DesignationId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DesignationName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DesingnationShortname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("DesignationId");
 
@@ -60,11 +58,11 @@ namespace EmployeeMvc.Migrations
 
             modelBuilder.Entity("EmployeeMvc.Models.Employeeinfo", b =>
                 {
-                    b.Property<int>("EmployeeId")
+                    b.Property<int>("AutoID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AutoID"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -81,6 +79,10 @@ namespace EmployeeMvc.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeeID")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GrossSalary")
@@ -101,7 +103,7 @@ namespace EmployeeMvc.Migrations
                     b.Property<string>("PhotoPath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("EmployeeId");
+                    b.HasKey("AutoID");
 
                     b.ToTable("Employeeinfos");
                 });

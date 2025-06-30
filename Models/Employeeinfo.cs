@@ -6,7 +6,8 @@ namespace EmployeeMvc.Models
     public class Employeeinfo
     {
         [Key]
-        public int EmployeeId { get; set; }
+        public int AutoID { get; set; } 
+        public string EmployeeID { get; set; }
         [StringLength(100)]
         public string Name { get; set; }
         [StringLength(50)]
@@ -21,7 +22,7 @@ namespace EmployeeMvc.Models
         public string? Phone {  get; set; }
         public string? PhotoPath {  get; set; }
         [NotMapped]
-        public IFormFile photo { get; set; }
+        public IFormFile? photo { get; set; }
 
     }
 }

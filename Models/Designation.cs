@@ -4,8 +4,12 @@ namespace EmployeeMvc.Models
 {
     public class Designation
     {
-        public int DesignationId { get; set; }
+        [Key]
+        [StringLength(3)]
+        public string DesignationId { get; set; }
         [StringLength(50)]
         public string DesignationName { get; set; }
+        [StringLength(20)]
+        public string? DesingnationShortname  { get; set; }
     }
 }

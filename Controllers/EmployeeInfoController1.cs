@@ -42,8 +42,8 @@ namespace EmployeeMvc.Controllers
             ViewBag.viewsearch = search;
             ViewBag.Hasprevious = page < 1;
             ViewBag.Hasforward = page < totalPages;
-
-            return View(employee);
+            ViewBag.emp = employee;
+            return View();
 
         }
         [HttpPost]
@@ -51,7 +51,7 @@ namespace EmployeeMvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (employee.EmployeeId == 0)
+                if (employee.AutoID == 0)
                     _dbContext.Employeeinfos.Add(employee);
                 else
                 {
@@ -59,7 +59,9 @@ namespace EmployeeMvc.Controllers
                 }
                 await _dbContext.SaveChangesAsync();
             }
-            return View(RedirectToAction("Index"));
+            return RedirectToAction("Index");
+
+
 
         }
         public async Task<IActionResult> Delete(int id)
