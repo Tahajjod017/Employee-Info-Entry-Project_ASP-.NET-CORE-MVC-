@@ -1,7 +1,36 @@
-﻿@model Designation
+﻿@model List<Designation>
 @{
 	ViewData["Title"] = "Designation";
 }
+<style>
+	.custom-label {
+	width: 18%;
+	text-align: right;
+	padding-right: 10px;
+	}
+
+	.custom-input {
+	width: 28%;
+	margin-right: 4%;
+	}
+
+	.form-row {
+	display: flex;
+	align-items: center;
+	margin-bottom: 1rem;
+	}
+
+	.form-container {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+	}
+	/* Remove default Bootstrap column constraints */
+	.col-6 {
+	max-width: none;
+	flex: none;
+	}
+</style>
 <div width="100" class="container-fluid">
 	<div class="row">
 		<div class="col-12">
@@ -12,55 +41,37 @@
 				<div class="card body">
 					<form id="DesignationForm" asp-action="Save" method="post">
 						<div class="row mt-4">
-							<div class="col-10 mb-4 text-end">
-								<button type="submit" class="btn btn-success me-2 ">Save</button>
+							<div class="col-8 mb-4 text-end">
+								<button type="submit" class="btn btn-success me-2">Save</button>
 								<button type="button" id="deleteBtn" class="btn btn-danger me-2">Delete</button>
 								<button type="button" id="clear" class="btn btn-secondary me-2">Clear</button>
 							</div>
 						</div>
-						<input type="hidden" asp-for="DesignationId" name="DesignationId" value="001" />
+						<input type="hidden" asp-for="@(new Designation().AutoId)" name="AutoID" value="0" />
 						<div class="row mt-3">
-							<!--Left Collmn (Form Fields)-col-10-->
-							<div class="col-10">
-								<!--Raw 1: DesingnationId- Designation Name in the Same Row-->
-								<div class="row mb-3">
-									<div class="col-6">
-										<div class="row">
-											<label class="col-sm-4 col-form-label text-end">Designation ID</label>
-											<div class="col sm-8">
-												<input type="text" asp-for="DesignationId" class="form-control" value="001" />
-											</div>
-										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="row">
-											<label class="col-sm-4 col-form-label text-end">Designation Name</label>
-											<div class="col-sm-8">
-												<input type="text" asp-for="DesignationName" class="form-control" />
-											</div>
-										</div>
-									</div>
-								</div>
-								<!--Row-2-->
-								<div class="row mb-3">
-									<div class="col-6">
-										<div class="row">
-											<label class="col-sm-4 col-form-label text-end">Short Name</label>
-											<div class="col col-sm-8">
-												<input type="text" asp-for="DesingnationShortname" class="form-control" />
-											</div>
-										</div>
-									</div>
+							<!-- Form Container with custom layout -->
+							<div class="col-12">
+								<div class="form-container">
+									<!-- Designation ID: 18% + 28% + 4% = 50% -->
+									<label class="custom-label col-form-label mb-3">Designation ID<span class="text-danger" style="font-size: 14px;">*</span></label>
+									<input type="text" asp-for="@(new Designation().DesignationId)" class="form-control mb-3 custom-input" value="@ViewBag.NextID" readonly />
+									<div class="col-md-6 mb-3"></div>
+									<!-- Designation Name: 18% + 28% + 4% = 50% -->
+									<label class="custom-label mb-3 col-form-label">Designation Name <span class="text-danger" style="font-size:14px;">*</span></label><
+									<input type="text" asp-for="@(new Designation().DesignationName)" class="form-control mb-3 custom-input" />
+
+									<!-- Short Name: 18% + 28% + 4% = 50% (but remove last 4% margin) -->
+									<label class="custom-label mb-3 col-form-label">Short Name <span class="text-danger" style="font-size: 14px;">*</span> </label>
+									<input type="text" asp-for="@(new Designation().DesingnationShortname)" class="form-control mb-3 custom-input" style="margin-right: 0;" />
 								</div>
 							</div>
-								
 						</div>
 					</form>
 					<!--Data Grid View-->
 					<div class="table section">
 						<div class="row mb-3">
 							<div class=" col md-6">
-								<div class="align-items-center">
+								<div class="align-items-center d-flex">
 									<span class="me-2">Grid Show:</span>
 									<select class="form-select" style="width:80px;">
 										<option>10</option>
@@ -78,30 +89,44 @@
 							</div>
 						</div>
 						<div class="table-responsive">
-							<table class="table table-bordered">
+							<table id="designationTable" class="table table-bordered">
 								<thead class="table-light">
 									<tr>
+										<th class="text-center">
+											Select all <input type="checkbox"id="selectAll" />
+										</th>
+
 										<th class="text-center">DesignationID </th>
 										<th class="text-center">DesignationName</th>
 										<th class="text-center">Short Name</th>
+										@* <th></th> *@
 									</tr>
+
 								</thead>
+
+
 								<tbody>
-									<tr>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-									</tr>
-									<tr>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-									</tr>
-									<tr>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-									</tr>
+									@if(Model != null && Model.Any())
+									{
+										@foreach(var designation in Model)
+										{
+											<tr data-id="@designation.DesignationId">
+												<td class="text-center">
+													<input type="checkbox" class="selectsingle" name="selectedItems " value="@designation.DesignationId" />
+												</td>
+
+												<td class="text-center">
+													<a href="javascript:void(0);" class="edit-btn" data-id="@designation.DesignationId">@designation.DesignationId</a>
+												</td>
+												<td>@designation.DesignationName</td>
+												<td class="text-center">@designation.DesingnationShortname</td>
+												@* <td class="text-center"><button type="button" class="btn btn-sm btn-primary edit-btn" data-id="@designation.DesignationId">Edit</button></td> *@
+
+											</tr>											
+										}
+									}
+									
+									
 								</tbody>
 							</table>
 						</div>
@@ -112,3 +137,137 @@
 		</div>
 	</div>
 </div>
+
+<!--Delete Confirmation Form Data-->
+<form id="deleteForm" asp-action="Delete" method="post" style="display: none;">
+	<input type="hidden" id="deleteId" name="id" />
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+	//Edit Button click handler//
+	$('#designationTable').on('click','.edit-btn',function() {
+		var designationId = $(this).data('id');
+		//Get designation data via AJAX
+		$.ajax({
+			url:'@Url.Action("GetDesignation", "Designation")',
+			type:'GET',
+			data: { id: designationId},
+			success: function(data){
+				console.log(data);
+				if(data) {
+					$('#DesignationId').val(data.designationId);
+					$('#DesignationName').val(data.designationName);
+					$('#DesingnationShortname').val(data.desingnationShortname);
+					$('#AutoId').val(data.autoId);
+				}
+				
+			},
+			error:function(){
+					alert('Error loading designation data');
+				}
+
+		});
+
+
+	}); 
+
+	// //delete button click handler
+	// $('#deletebtn').click(function() 
+	// {
+	// 	var designationid = $('#designationid').val();
+	// 	if (designationid && designationid.trim()){
+	// 		if (confirm('are you sure you want to delete the selected'+ selectedids.length + 'designation(s)?')) {\
+	// 			//call the new bulkdelete action
+	// 			$('#deleteid').val(designationid);
+	// 			$('#deleteform').submit();
+	// 		}
+	// 		else{
+	// 			alert('please select a designation to delete');
+	// 		}
+
+	// 	}
+	// });
+
+
+	//Cleare Form File
+		$('#clear').on('click', function() {
+		$('#DesignationForm')[0].reset();
+		$('#DesignationId').val('@ViewBag.NextID'); // Reset to next ID
+		$('#AutoId').val('0'); // Reset AutoId to 0
+		$('.selectsingle').prop('checked', false); // Uncheck all checkboxes
+
+		});
+
+ 			$('#selectAll').on('click', function(){
+		var isChecked = $(this).prop('checked');
+		console.log(isChecked);
+					$('.selectsingle').prop('checked', isChecked);
+});
+
+
+
+// $('#deleteBtn').click(function() {
+// 		var ids = [];
+// 	$('.selectsingle:checked').each(function(){
+// 			ids.push($(this).val());
+// 	});
+// 		console.log(ids);
+// 		if(ids.length == 0)
+// 	{
+// 		alert('Please select at least one designation to delete');
+// 		return;
+// 	}
+// 		if(confirm('Are you sure you want to delete the selected ' + ids.length + ' designations(s)?'))
+// 			$.ajax({
+// 			url: '@Url.Action("BulkDelete", "Designation")',
+// 			type: 'POST',
+// 			contentType: 'application/json;',
+// 			data: JSON.stringify(ids),
+// 			success: function () {
+// 				alert('Deletion successful!');
+// 				location.reload();
+// 			},
+// 			error: function () {
+// 				alert('An error occurred during the delete operation.');
+// 			}
+// 		});
+// });	
+
+$('#deleteBtn').click(function(){
+	var ids=[];
+	$('.selectsingle:checked').each(function (){
+				ids.push($(this).val());
+	});
+		console.log(ids);
+		if(ids.length == 0){
+			var designationId = $('#DesignationId').val();
+			if(designationId && designationId.trim()!==''){
+				if(confirm('Are you sure you want to delete this designation?')){
+					$('#deleteId').val(designationId);
+					$('#deleteForm').submit();
+				}else{
+					alert('Please select a designation to delete')
+				}
+			}
+		}
+		else{
+			if(confirm('Are you sure you want to delete the selected '+ids.length + ' designations(s)?'))
+				$.ajax({
+					url:'@Url.Action("BulkDelete", "Designation")',
+					type:'POST',
+					contentType:'application/json',
+					data:JSON.stringify(ids),
+					success:function(){
+						alert('Deletion successful!');
+						location.reload();
+						},error:function(){
+							alert('An error occurred during the delete operation.');
+				}
+			});
+		}
+		
+
+});
+</script>

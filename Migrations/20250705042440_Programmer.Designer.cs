@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EmployeeMvc.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250630040820_Employees")]
-    partial class Employees
+    [Migration("20250705042440_Programmer")]
+    partial class Programmer
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,12 @@ namespace EmployeeMvc.Migrations
                     b.Property<string>("DepartmentId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("AutoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AutoId"));
+
                     b.Property<string>("DepartmentName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -43,7 +49,14 @@ namespace EmployeeMvc.Migrations
             modelBuilder.Entity("EmployeeMvc.Models.Designation", b =>
                 {
                     b.Property<string>("DesignationId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<int>("AutoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AutoId"));
 
                     b.Property<string>("DesignationName")
                         .IsRequired()
@@ -51,8 +64,8 @@ namespace EmployeeMvc.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("DesingnationShortname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("DesignationId");
 

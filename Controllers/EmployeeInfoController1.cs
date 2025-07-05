@@ -77,7 +77,7 @@ namespace EmployeeMvc.Controllers
         }
         public async Task<IActionResult> Cleare(int id)
         {
-            return View(RedirectToAction("Index"));
+            return (RedirectToAction("Index"));
         }
 
     }
