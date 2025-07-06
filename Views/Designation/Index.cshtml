@@ -2,6 +2,20 @@
 @{
 	ViewData["Title"] = "Designation";
 }
+@if (TempData["ErrorMessage"] != null)
+{
+	<div class="alert alert-danger" id="ErrorMessage">
+		@TempData["ErrorMessage"]
+	</div>
+}
+
+@if(TempData ["SuccessMessage"] != null)
+{
+ <div class="alert alert-success" id="SuccessMessage">
+		@TempData["SuccessMessage"]
+ </div>
+}
+
 <style>
 	.custom-label {
 	width: 18%;
@@ -42,7 +56,7 @@
 					<form id="DesignationForm" asp-action="Save" method="post">
 						<div class="row mt-4">
 							<div class="col-8 mb-4 text-end">
-								<button type="submit" class="btn btn-success me-2">Save</button>
+								<button type="submit" id="saveBtn" class="btn btn-success me-2">Save</button>
 								<button type="button" id="deleteBtn" class="btn btn-danger me-2">Delete</button>
 								<button type="button" id="clear" class="btn btn-secondary me-2">Clear</button>
 							</div>
@@ -57,7 +71,7 @@
 									<input type="text" asp-for="@(new Designation().DesignationId)" class="form-control mb-3 custom-input" value="@ViewBag.NextID" readonly />
 									<div class="col-md-6 mb-3"></div>
 									<!-- Designation Name: 18% + 28% + 4% = 50% -->
-									<label class="custom-label mb-3 col-form-label">Designation Name <span class="text-danger" style="font-size:14px;">*</span></label><
+									<label class="custom-label mb-3 col-form-label">Designation Name <span class="text-danger" style="font-size:14px;">*</span></label>
 									<input type="text" asp-for="@(new Designation().DesignationName)" class="form-control mb-3 custom-input" />
 
 									<!-- Short Name: 18% + 28% + 4% = 50% (but remove last 4% margin) -->
@@ -247,6 +261,7 @@ $('#deleteBtn').click(function(){
 				if(confirm('Are you sure you want to delete this designation?')){
 					$('#deleteId').val(designationId);
 					$('#deleteForm').submit();
+
 				}else{
 					alert('Please select a designation to delete')
 				}
@@ -265,9 +280,51 @@ $('#deleteBtn').click(function(){
 						},error:function(){
 							alert('An error occurred during the delete operation.');
 				}
+
 			});
 		}
-		
-
 });
+	// $('#saveBtn').click(function() {
+	// 	// Validate form inputs
+	// 	var designationName = $('#DesignationName').val().trim();
+	// 		var designationId = $('#DesignationId').val();
+	// 		if(designationName === '') {
+	// 			alert("Designation name is required")
+	// 				return;
+	// 		}
+	// 		$.ajax({
+	// 		    URL:'/Designation/IsDuplicate',
+	// 			type:'POST',
+	// 			contentType: 'application/json;',
+	// 			data:{
+	// 					designationName: designationName,
+	// 					designationId: designationId
+	// 			},
+	// 			success:function(isDuplicate){
+	// 				if(isDuplicate === true)
+	// 				{
+	// 						alert("Data alrady exist.");
+	// 						return;
+	// 					}
+	// 					else {
+	// 						// Submit the form if no duplicates found
+	// 						$('#DesignationForm').submit();
+	// 				}
+	// 				error: function (){
+	// 					alert("An error occured during validation")
+			// 		}
+			// 	}
+			// });
+				setTimeout(function () {
+				var success = document.getElementById("SuccessMessage");
+				if (success) {
+					success.style.display = "none";
+				}
+
+				var error = document.getElementById("ErrorMessage");
+				if (error) {
+					error.style.display = "none";
+				}
+			}, 3000);
+
 </script>
