@@ -106,12 +106,12 @@
 							<table id="designationTable" class="table table-bordered">
 								<thead class="table-light">
 									<tr>
-										<th class="text-center">
+										<th width="10%" class="text-center">
 											Select all <input type="checkbox"id="selectAll" />
 										</th>
 
-										<th class="text-center">DesignationID </th>
-										<th class="text-center">DesignationName</th>
+										<th width="10%" class="text-center"> Designation ID </th>
+										<th class="text-center">Designation Name</th>
 										<th class="text-center">Short Name</th>
 										@* <th></th> *@
 									</tr>
@@ -125,11 +125,11 @@
 										@foreach(var designation in Model)
 										{
 											<tr data-id="@designation.DesignationId">
-												<td class="text-center">
+												<td width="10%" class="text-center">
 													<input type="checkbox" class="selectsingle" name="selectedItems " value="@designation.DesignationId" />
 												</td>
 
-												<td class="text-center">
+												<td width="10%"class="text-center">
 													<a href="javascript:void(0);" class="edit-btn" data-id="@designation.DesignationId">@designation.DesignationId</a>
 												</td>
 												<td>@designation.DesignationName</td>
@@ -213,7 +213,6 @@
 		$('.selectsingle').prop('checked', false); // Uncheck all checkboxes
 
 		});
-
  			$('#selectAll').on('click', function(){
 		var isChecked = $(this).prop('checked');
 		console.log(isChecked);

@@ -12,11 +12,20 @@ namespace EmployeeMvc.Controllers
         {
             dbContext = _dbContext;
         }
-        public async Task<IActionResult>Index()
+        private bool ISPartial = false;
+        public async Task<IActionResult>Index(bool isPartial = false)
         {
             var NextID = await GetDesignationNextID();
             ViewBag.NextID = NextID;
             var Designation = await dbContext.Designations.ToListAsync();
+
+            if (isPartial)
+            {
+                ISPartial = true;
+                return PartialView(Designation);
+
+            }
+
             return View(Designation);
         }
 
@@ -25,31 +34,6 @@ namespace EmployeeMvc.Controllers
             var data = await dbContext.Designations.ToListAsync();
             return Json(data);
         }
-
-        //[HttpPost]
-        //public async Task<IActionResult>Save(Designation employee)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        if (employee.AutoId == 0)
-
-        //            dbContext.Designations.Add(employee);
-        //        else
-        //        {
-        //            var existingEmployee = await dbContext.Designations.FindAsync(employee.DesignationId);
-        //            if (existingEmployee != null)
-        //            {
-        //                existingEmployee.DesignationName = employee.DesignationName;
-        //                existingEmployee.DesingnationShortname = employee.DesingnationShortname;
-
-        //            }
-
-        //        }
-        //        await dbContext.SaveChangesAsync();
-
-        //    }
-        //    return RedirectToAction("Index");
-        //}
 
         [HttpPost]
         public async Task<IActionResult> Save(Designation employee)
@@ -61,13 +45,16 @@ namespace EmployeeMvc.Controllers
                 .AnyAsync(d => d.DesignationName.Trim().ToLower() == inputName && d.DesignationId != employee.DesignationId);
             if (isDuplicate)
             {
-                TempData["ErrorMessage"]= "Data alrady exists with this name";
+                TempData["ErrorMessage"]= "Data alrady exists with this name?";
+                //if (ISPartial)
+                //    return RedirectToAction("EmployeeController1", "Index");
+
                 return RedirectToAction("Index");
             }
                 if (employee.AutoId == 0)
             {
                 dbContext.Designations.Add(employee);
-                TempData["SuccessMessage"] = "Data Save Successfuly";
+                TempData["SuccessMessage"] = "Employee added successfully!";
             }
             
             
@@ -80,7 +67,7 @@ namespace EmployeeMvc.Controllers
                         existingEmployee.DesingnationShortname = employee.DesingnationShortname;
 
                     }
-                    TempData["SuccessMessage"] = "Data Updated Successfuly";
+                    TempData["SuccessMessage"] = "Data Updated Successfuly!";
 
                 }
                 await dbContext.SaveChangesAsync();
@@ -94,10 +81,10 @@ namespace EmployeeMvc.Controllers
         {
             var designation = await dbContext.Designations.FindAsync(id);
                 if(designation != null)
-            {
-                dbContext.Designations.Remove(designation);
-                await dbContext.SaveChangesAsync();
-            }
+                {
+                  dbContext.Designations.Remove(designation);
+                  await dbContext.SaveChangesAsync();
+                }
             return RedirectToAction("Index"); 
         }
         [HttpGet]
@@ -128,7 +115,7 @@ namespace EmployeeMvc.Controllers
 
         [HttpPost]
         public async Task<IActionResult> BulkDelete([FromBody] List<string> ids)
-        {
+       {
 
             if (ids == null)
                 return NotFound();

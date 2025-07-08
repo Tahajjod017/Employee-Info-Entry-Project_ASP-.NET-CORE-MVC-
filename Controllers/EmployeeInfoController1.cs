@@ -80,5 +80,10 @@ namespace EmployeeMvc.Controllers
             return (RedirectToAction("Index"));
         }
 
+        public IActionResult AddPartial()
+        {
+            return PartialView("_AddPartial", new Designation());
+        }
+
     }
 }
