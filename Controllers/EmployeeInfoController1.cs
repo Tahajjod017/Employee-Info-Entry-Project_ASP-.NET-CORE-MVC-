@@ -60,6 +60,7 @@ namespace EmployeeMvc.Controllers
                 await _dbContext.SaveChangesAsync();
             }
             return RedirectToAction("Index");
+            
 
 
 
@@ -75,7 +76,7 @@ namespace EmployeeMvc.Controllers
             return Json(employee);
 
         }
-        public async Task<IActionResult> Cleare(int id)
+        public async Task<IActionResult> Clear (int id)
         {
             return (RedirectToAction("Index"));
         }
@@ -83,7 +84,9 @@ namespace EmployeeMvc.Controllers
         public IActionResult AddPartial()
         {
             return PartialView("_AddPartial", new Designation());
+            
         }
+        
 
     }
 }

@@ -9,40 +9,40 @@
 	</div>
 }
 
-@if(TempData ["SuccessMessage"] != null)
+@if (TempData["SuccessMessage"] != null)
 {
- <div class="alert alert-success" id="SuccessMessage">
+	<div class="alert alert-success" id="SuccessMessage">
 		@TempData["SuccessMessage"]
- </div>
+	</div>
 }
 
 <style>
 	.custom-label {
-	width: 18%;
-	text-align: right;
-	padding-right: 10px;
+		width: 18%;
+		text-align: right;
+		padding-right: 10px;
 	}
 
 	.custom-input {
-	width: 28%;
-	margin-right: 4%;
+		width: 28%;
+		margin-right: 4%;
 	}
 
 	.form-row {
-	display: flex;
-	align-items: center;
-	margin-bottom: 1rem;
+		display: flex;
+		align-items: center;
+		margin-bottom: 1rem;
 	}
 
 	.form-container {
-	display: flex;
-	flex-wrap: wrap;
-	width: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
 	}
 	/* Remove default Bootstrap column constraints */
 	.col-6 {
-	max-width: none;
-	flex: none;
+		max-width: none;
+		flex: none;
 	}
 </style>
 <div width="100" class="container-fluid">
@@ -56,9 +56,9 @@
 					<form id="DesignationForm" asp-action="Save" method="post">
 						<div class="row mt-4">
 							<div class="col-8 mb-4 text-end">
-								<button type="submit" id="saveBtn" class="btn btn-success me-2">Save</button>
-								<button type="button" id="deleteBtn" class="btn btn-danger me-2">Delete</button>
-								<button type="button" id="clear" class="btn btn-secondary me-2">Clear</button>
+								<button type="button" id="desig-saveBtn" class="btn btn-success me-2">Save</button>
+								<button type="button" id="desig-deleteBtn" class="btn btn-danger me-2">Delete</button>
+								<button type="button" id="desig-clear" class="btn btn-secondary me-2">Clear</button>
 							</div>
 						</div>
 						<input type="hidden" asp-for="@(new Designation().AutoId)" name="AutoID" value="0" />
@@ -98,7 +98,7 @@
 							</div>
 							<div class="col-md-6">
 								<div class="d-flex justify-content-end">
-									<input type="text" class="form-control" placeholder="Search" style = "width:200px" />
+									<input type="text" class="form-control" placeholder="Search" style="width:200px" />
 								</div>
 							</div>
 						</div>
@@ -107,7 +107,7 @@
 								<thead class="table-light">
 									<tr>
 										<th width="10%" class="text-center">
-											Select all <input type="checkbox"id="selectAll" />
+											Select all <input type="checkbox" id="selectAll" />
 										</th>
 
 										<th width="10%" class="text-center"> Designation ID </th>
@@ -119,34 +119,35 @@
 								</thead>
 
 
-								<tbody>
-									@if(Model != null && Model.Any())
+								<tbody id="Designationtablebody">
+									@* @if (Model != null && Model.Any())
 									{
-										@foreach(var designation in Model)
+										@foreach (var designation in Model)
 										{
 											<tr data-id="@designation.DesignationId">
 												<td width="10%" class="text-center">
 													<input type="checkbox" class="selectsingle" name="selectedItems " value="@designation.DesignationId" />
 												</td>
 
-												<td width="10%"class="text-center">
+												<td width="10%" class="text-center">
 													<a href="javascript:void(0);" class="edit-btn" data-id="@designation.DesignationId">@designation.DesignationId</a>
 												</td>
 												<td>@designation.DesignationName</td>
 												<td class="text-center">@designation.DesingnationShortname</td>
-												@* <td class="text-center"><button type="button" class="btn btn-sm btn-primary edit-btn" data-id="@designation.DesignationId">Edit</button></td> *@
+												
 
-											</tr>											
+											</tr>
 										}
-									}
-									
-									
+									} *@
+
+
+
 								</tbody>
 							</table>
 						</div>
 					</div>
 				</div>
-				
+
 			</div>
 		</div>
 	</div>
@@ -160,7 +161,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
-	//Edit Button click handler//
+		//Edit Button click handler//
 	$('#designationTable').on('click','.edit-btn',function() {
 		var designationId = $(this).data('id');
 		//Get designation data via AJAX
@@ -176,84 +177,87 @@
 					$('#DesingnationShortname').val(data.desingnationShortname);
 					$('#AutoId').val(data.autoId);
 				}
-				
+
 			},
 			error:function(){
 					alert('Error loading designation data');
-				}
+			}
 
 		});
 
 
-	}); 
+	});
 
-	// //delete button click handler
-	// $('#deletebtn').click(function() 
-	// {
-	// 	var designationid = $('#designationid').val();
-	// 	if (designationid && designationid.trim()){
-	// 		if (confirm('are you sure you want to delete the selected'+ selectedids.length + 'designation(s)?')) {\
-	// 			//call the new bulkdelete action
-	// 			$('#deleteid').val(designationid);
-	// 			$('#deleteform').submit();
-	// 		}
-	// 		else{
-	// 			alert('please select a designation to delete');
-	// 		}
+		// //delete button click handler
+		// $('#deletebtn').click(function()
+		// {
+		// 	var designationid = $('#designationid').val();
+		// 	if (designationid && designationid.trim()){
+		// 		if (confirm('are you sure you want to delete the selected'+ selectedids.length + 'designation(s)?')) {\
+		// 			//call the new bulkdelete action
+		// 			$('#deleteid').val(designationid);
+		// 			$('#deleteform').submit();
+		// 		}
+		// 		else{
+		// 			alert('please select a designation to delete');
+		// 		}
 
-	// 	}
-	// });
+		// 	}
+		// });
 
 
-	//Cleare Form File
-		$('#clear').on('click', function() {
+		//Cleare Form File
+	$('#clear').on('click', function() {
 		$('#DesignationForm')[0].reset();
 		$('#DesignationId').val('@ViewBag.NextID'); // Reset to next ID
 		$('#AutoId').val('0'); // Reset AutoId to 0
 		$('.selectsingle').prop('checked', false); // Uncheck all checkboxes
 
-		});
- 			$('#selectAll').on('click', function(){
+	});
+		
+	$('#selectAll').on('click', function(){
 		var isChecked = $(this).prop('checked');
 		console.log(isChecked);
-					$('.selectsingle').prop('checked', isChecked);
-});
-
-
-
-// $('#deleteBtn').click(function() {
-// 		var ids = [];
-// 	$('.selectsingle:checked').each(function(){
-// 			ids.push($(this).val());
-// 	});
-// 		console.log(ids);
-// 		if(ids.length == 0)
-// 	{
-// 		alert('Please select at least one designation to delete');
-// 		return;
-// 	}
-// 		if(confirm('Are you sure you want to delete the selected ' + ids.length + ' designations(s)?'))
-// 			$.ajax({
-// 			url: '@Url.Action("BulkDelete", "Designation")',
-// 			type: 'POST',
-// 			contentType: 'application/json;',
-// 			data: JSON.stringify(ids),
-// 			success: function () {
-// 				alert('Deletion successful!');
-// 				location.reload();
-// 			},
-// 			error: function () {
-// 				alert('An error occurred during the delete operation.');
-// 			}
-// 		});
-// });	
-
-$('#deleteBtn').click(function(){
-	var ids=[];
-	$('.selectsingle:checked').each(function (){
-				ids.push($(this).val());
+		$('.selectsingle').prop('checked', isChecked);
 	});
+
+
+
+	// $('#deleteBtn').click(function() {
+	// 		var ids = [];
+	// 	$('.selectsingle:checked').each(function(){
+	// 			ids.push($(this).val());
+	// 	});
+	// 		console.log(ids);
+	// 		if(ids.length == 0)
+	// 	{
+	// 		alert('Please select at least one designation to delete');
+	// 		return;
+	// 	}
+	// 		if(confirm('Are you sure you want to delete the selected ' + ids.length + ' designations(s)?'))
+	// 			$.ajax({
+	// 			url: '@Url.Action("BulkDelete", "Designation")',
+	// 			type: 'POST',
+	// 			contentType: 'application/json;',
+	// 			data: JSON.stringify(ids),
+	// 			success: function () {
+	// 				alert('Deletion successful!');
+	// 				location.reload();
+	// 			},
+	// 			error: function () {
+	// 				alert('An error occurred during the delete operation.');
+	// 			}
+	// 		});
+	// });
+
+	$('#desig-deleteBtn').click(function(){
+		var ids=[];
+		$('.selectsingle:checked').each(function (){
+					ids.push($(this).val());
+		});
+
 		console.log(ids);
+
 		if(ids.length == 0){
 			var designationId = $('#DesignationId').val();
 			if(designationId && designationId.trim()!==''){
@@ -268,62 +272,134 @@ $('#deleteBtn').click(function(){
 		}
 		else{
 			if(confirm('Are you sure you want to delete the selected '+ids.length + ' designations(s)?'))
-				$.ajax({
-					url:'@Url.Action("BulkDelete", "Designation")',
-					type:'POST',
-					contentType:'application/json',
-					data:JSON.stringify(ids),
-					success:function(){
-						alert('Deletion successful!');
-						location.reload();
-						},error:function(){
-							alert('An error occurred during the delete operation.');
+			$.ajax({
+				url:'@Url.Action("BulkDelete", "Designation")',
+				type:'POST',
+				contentType:'application/json',
+				data:JSON.stringify(ids),
+				success:function(){
+					alert('Deletion successful!');
+					location.reload();
+					},error:function(){
+						alert('An error occurred during the delete operation.');
 				}
 
 			});
 		}
-});
-	// $('#saveBtn').click(function() {
-	// 	// Validate form inputs
-	// 	var designationName = $('#DesignationName').val().trim();
-	// 		var designationId = $('#DesignationId').val();
-	// 		if(designationName === '') {
-	// 			alert("Designation name is required")
-	// 				return;
-	// 		}
-	// 		$.ajax({
-	// 		    URL:'/Designation/IsDuplicate',
-	// 			type:'POST',
-	// 			contentType: 'application/json;',
-	// 			data:{
-	// 					designationName: designationName,
-	// 					designationId: designationId
-	// 			},
-	// 			success:function(isDuplicate){
-	// 				if(isDuplicate === true)
-	// 				{
-	// 						alert("Data alrady exist.");
-	// 						return;
-	// 					}
-	// 					else {
-	// 						// Submit the form if no duplicates found
-	// 						$('#DesignationForm').submit();
-	// 				}
-	// 				error: function (){
-	// 					alert("An error occured during validation")
-			// 		}
-			// 	}
-			// });
-				setTimeout(function () {
-				var success = document.getElementById("SuccessMessage");
-				if (success) {
-					success.style.display = "none";
-				}
+	});
+		// $('#saveBtn').click(function() {
+		// 	// Validate form inputs
+		// 	var designationName = $('#DesignationName').val().trim();
+		// 		var designationId = $('#DesignationId').val();
+		// 		if(designationName === '') {
+		// 			alert("Designation name is required")
+		// 				return;
+		// 		}
+		// 		$.ajax({
+		// 		    URL:'/Designation/IsDuplicate',
+		// 			type:'POST',
+		// 			contentType: 'application/json;',
+		// 			data:{
+		// 					designationName: designationName,
+		// 					designationId: designationId
+		// 			},
+		// 			success:function(isDuplicate){
+		// 				if(isDuplicate === true)
+		// 				{
+		// 						alert("Data alrady exist.");
+		// 						return;
+		// 					}
+		// 					else {
+		// 						// Submit the form if no duplicates found
+		// 						$('#DesignationForm').submit();
+		// 				}
+		// 				error: function (){
+		// 					alert("An error occured during validation")
+				// 		}
+				// 	}
+				// });
 
-				var error = document.getElementById("ErrorMessage");
-				if (error) {
-					error.style.display = "none";
-				}
-			}, 3000);
+
+	setTimeout(function () {
+		var success = document.getElementById("SuccessMessage");
+		if (success) {
+			success.style.display = "none";
+		}
+
+		var error = document.getElementById("ErrorMessage");
+		if (error) {
+			error.style.display = "none";
+		}
+	}, 3000);
+
+	$('#desig-saveBtn').click(function (e) {
+		e.preventDefault();
+		// Validate form inputs
+		var data = {
+			DesignationId: $('#DesignationId').val(),
+			DesignationName: $('#DesignationName').val(),
+			DesingnationShortname: $('#DesingnationShortname').val(),
+			AutoId: $('#AutoId').val()
+		};
+		$.ajax({
+			url: '/Designation/Save',
+			type: 'POST',
+			data: data,
+			success: function (response) {
+				// ✅ Close the modal
+				// $('#exampleModal').modal('hide');
+				loadDesignationTable();
+
+				// ✅ Reset the form
+				$('#DesignationForm')[0].reset();	
+			},
+			error: function () {
+				alert('Failed to save designation.');
+			}
+		});
+	});
+
+	function loadDesignationTable(){
+		fetch(`/Designation/Getall`)
+		.then(response=>response.json())
+		.then(data => {	
+			showTableData(data);			
+		})
+	}
+
+	function showTableData(data) {
+		const tableBody = document.getElementById('Designationtablebody');
+		tableBody.innerHTML = ""; 
+
+		data.forEach(designation => {
+			const row = tableBody.insertRow();
+			row.setAttribute('data-id', designation.designationId);
+
+			// Checkbox column
+			const checkboxCell = row.insertCell(0);
+			checkboxCell.className = "text-center";
+			checkboxCell.style.width = "10%";
+			checkboxCell.innerHTML = `<input type="checkbox" class="selectsingle" name="selectedItems" value="${designation.designationId}" />`;
+
+			// Edit link column
+			const idCell = row.insertCell(1);
+			idCell.className = "text-center";
+			idCell.style.width = "10%";
+			idCell.innerHTML = `<a href="javascript:void(0);" class="edit-btn" data-id="${designation.designationId}">${designation.designationId}</a>`;
+
+			// Designation Name
+			const nameCell = row.insertCell(2);
+			nameCell.textContent = designation.designationName;
+
+			// Short Name
+			const shortNameCell = row.insertCell(3);
+			shortNameCell.className = "text-center";
+			shortNameCell.textContent = designation.desingnationShortname;
+		});
+	}
+
+	$(document).ready(function(){
+		loadDesignationTable();
+	});
 
 </script>

@@ -25,7 +25,7 @@
                     <form id="employeeForm" asp-action="Save" method="post">
                         <div class="row mt-2">
                             <div class="col-9 mb-4 text-end">
-                                <button type="submit" class="btn btn-lg btn-success me-2">Save</button>
+                                <button type="submit" id="saveBtn" class="btn btn-lg btn-success me-2">Save</button>
                                 <button type="button" id="deleteBtn" class="btn btn-lg btn-danger me-2">Delete</button>
                                 <button type="button" id="clearBtn" class="btn btn-lg btn-secondary">Clear</button>
                             </div>
@@ -349,4 +349,19 @@
                         $('#desigModalBody').load('/Designation/Index?isPartial=true');
                     });
                 });
+
+                function DesignationDD(){
+                     $.get('/Designation/GetAll', function (designations) {
+                        var dropdown = $('#Designation');
+                        dropdown.empty();
+                        $.each(designations, function (i, item) {
+                            dropdown.append($('<option>', {
+                                value: item.designationId,
+                                text: item.designationName
+
+                            }));
+                        });
+                    });
+                }
+
             </script>

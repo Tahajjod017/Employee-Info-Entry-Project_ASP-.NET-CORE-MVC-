@@ -39,7 +39,7 @@ namespace EmployeeMvc.Controllers
         public async Task<IActionResult> Save(Designation employee)
         {
             if (!ModelState.IsValid)
-                return RedirectToAction("Index");
+            return Json(new { success = false });
             string inputName = employee.DesignationName.Trim().ToLower();
             bool isDuplicate = await dbContext.Designations
                 .AnyAsync(d => d.DesignationName.Trim().ToLower() == inputName && d.DesignationId != employee.DesignationId);
@@ -51,13 +51,15 @@ namespace EmployeeMvc.Controllers
 
                 return RedirectToAction("Index");
             }
+
                 if (employee.AutoId == 0)
-            {
+                {
+
                 dbContext.Designations.Add(employee);
                 TempData["SuccessMessage"] = "Employee added successfully!";
-            }
-            
-            
+
+                }
+        
                 else
                 {
                     var existingEmployee = await dbContext.Designations.FindAsync(employee.DesignationId);
@@ -72,7 +74,7 @@ namespace EmployeeMvc.Controllers
                 }
                 await dbContext.SaveChangesAsync();
                
-                return RedirectToAction("Index");
+                return Json(new { success = true });
             
             
         }
