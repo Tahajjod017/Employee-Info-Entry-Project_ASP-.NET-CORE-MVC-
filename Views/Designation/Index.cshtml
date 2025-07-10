@@ -332,6 +332,8 @@
 		}
 	}, 3000);
 
+
+
 	$('#desig-saveBtn').click(function (e) {
 		e.preventDefault();
 		// Validate form inputs
@@ -351,7 +353,13 @@
 				loadDesignationTable();
 
 				// ✅ Reset the form
-				$('#DesignationForm')[0].reset();	
+				$('#DesignationForm')[0].reset();
+
+					if (typeof DesignationDD === 'function') {
+					DesignationDD();
+					}
+
+
 			},
 			error: function () {
 				alert('Failed to save designation.');

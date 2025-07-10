@@ -31,7 +31,7 @@ namespace EmployeeMvc.Controllers
 
         public async Task<JsonResult> Getall()
         {
-            var data = await dbContext.Designations.ToListAsync();
+            var data = await dbContext.Designations.OrderByDescending(x=>x.AutoId).ToListAsync();
             return Json(data);
         }
 

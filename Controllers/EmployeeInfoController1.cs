@@ -19,8 +19,24 @@ namespace EmployeeMvc.Controllers
         {
             ViewBag.Departments = await _dbContext.Departments.ToListAsync();
             ViewBag.Designation = await _dbContext.Designations.ToListAsync();
-            //Query empliyess with search functionality
-            var query = _dbContext.Employeeinfos.AsQueryable();
+
+           // Query empliyess with search functionality
+            var query1 = from emp in _dbContext.Employeeinfos
+                         join des in _dbContext.Designations on emp.Designation equals des.DesignationId
+                         join dep in _dbContext.Departments on emp.Department equals dep.DepartmentId
+                         select new
+                         {
+                             emp.EmployeeID,
+                             emp.Name,
+                             emp.Email,
+                             emp.Phone,
+                             emp.GrossSalary,
+                             emp.JoiningDate,
+                             Designation = des.DesignationName,
+                             Department = dep.DepartmentName
+                         };
+
+            var query = query1.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -36,6 +52,7 @@ namespace EmployeeMvc.Controllers
                 .Take(PageSize)
                 .ToListAsync();
 
+            ViewBag.viewpage = totalPages;
             ViewBag.viewpage = totalPages;
             ViewBag.viewrecords = totalRecords;
             ViewBag.viewsize = PageSize;

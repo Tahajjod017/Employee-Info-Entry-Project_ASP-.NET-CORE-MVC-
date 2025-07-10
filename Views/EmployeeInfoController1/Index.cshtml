@@ -4,13 +4,14 @@
     ViewData["Title"] = "Employee Information Entry";
     var departments = ViewBag.Departments as List<EmployeeMvc.Models.Department>;
     var designations = ViewBag.Designation as List<EmployeeMvc.Models.Designation>;
+    var employee = ViewBag.emp as List<EmployeeMvc.Models.Employeeinfo>;
 }
 <style>
     .pagination-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
     }
 </style>
 <div width="100%" class="container-fluid">
@@ -64,13 +65,13 @@
                                             <div class="col-sm-7">
                                                 <select asp-for="Designation" name="Designation" class="form-control" required>
                                                     <option value= "" disabled selected>Choose</option >
-                                                    @if (designations != null)
+                                                    @* @if (designations != null)
                                                     {
                                                         foreach (var designation in designations)
                                                         {
                                                             <option value="@designation.DesignationId.ToString()">@designation.DesignationName</option>
                                                         }
-                                                    }
+                                                    } *@
                                                 </select>
                                             </div>
                                             <div class="col-sm-1">
@@ -103,7 +104,7 @@
 
                                                 <span class="text-success">
                                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                                      +
+                                                        +
                                                     </button>
                                                 </span>
                                             </div>
@@ -186,7 +187,7 @@
                                         <img id="photoPreview" src="" alt="Photo Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
                                         <div id="photoPlaceholder" class="d-flex align-items-center justify-content-center h-100">
                                             <span class="text-muted">Insert Photo</span>
-                                        
+
                                         </div>
                                     </div>
                                 </div>
@@ -194,10 +195,11 @@
                         </div>
                     </form>
                     <!--Employee Data Grid View-->
+                    <div class="table-responsive"></div>
                     <div class=" table section">
-                       <div class=" row mb-3">
-                           <div class=" col-md-6">
-                            <div class="d-flex align-items-center">
+                        <div class=" row mb-3">
+                            <div class=" col-md-6">
+                                <div class="d-flex align-items-center">
                                     <span class="me-2">Grid Show:</span>
                                     <select class="form-select"style="width:80px;">
                                         <option>10</option>
@@ -206,77 +208,52 @@
                                         <option>100</option>                                    
                                     </select>
                                     <span class="ms-2">entries</span> 
+                                </div>
                             </div>
-                           </div>
-                           <div class="col-md-6"> 
+                            <div class="col-md-6"> 
                                 <div class="d-flex justify-content-end">
                                     <input type="text" class="form-control" placeholder="Search" style="width:200px" />
                                 </div>
-                           </div>
-                          
-                       </div>
-                       <div class="table-responsive">
-                           <table class="table table-bordered">
-                               <thead class="table-light">
-                                   <tr>
-                                       <th>Emp.ID</th>
-                                       <th>Name</th>
-                                       <th>Designation</th>
-                                       <th>Department</th>
-                                       <th>GrossSalary</th>
-                                       <th>JoiningDate</th>
-                                   </tr>
-                               </thead>
-                               <tbody>
-                                   <tr>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp</td>
-                                   </tr>
-                                   <tr>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                   </tr>
-                                   <tr>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                   </tr>
-                                   <tr>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                   </tr>
-                                   <tr>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                   </tr>
-                                   <tr>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                       <td>&nbsp;</td>
-                                  </tr>
+                            </div>
+
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Emp.ID</th>
+                                        <th>Name</th>
+                                        <th>Designation</th>
+                                        <th>Department</th>
+                                        <th>GrossSalary</th>
+                                        <th>JoiningDate</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @if (true)
+                                    {
+                                        foreach (var emp in ViewBag.emp)
+                                        {
+                                            <tr>
+                                                <td>@emp.EmployeeID</td>
+                                                <td>@emp.Name</td>
+                                                <td>@emp.Designation</td>
+                                                <td>@emp.Department</td>
+                                                <td>@emp.GrossSalary</td>
+                                                <td>@emp.JoiningDate.ToString("yyyy-MM-dd")</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+			                    	<tr>
+											<td>No Data found</td>
+                                        </tr>
+                                    }
+
                                </tbody>
+
                            </table>
                        </div>
                        <div class="pagination-section">
@@ -345,8 +322,10 @@
             <script>
 
                 $(document).ready(function(){
+                    DesignationDD();
                     $('#loadDesignationModal').on('click',function(){
                         $('#desigModalBody').load('/Designation/Index?isPartial=true');
+                        DesignationDD();
                     });
                 });
 
