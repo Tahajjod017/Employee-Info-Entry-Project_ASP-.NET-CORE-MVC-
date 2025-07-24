@@ -25,58 +25,46 @@ namespace EmployeeMvc.Controllers
                 return PartialView(Designation);
 
             }
-
             return View(Designation);
         }
-
         public async Task<JsonResult> Getall()
         {
             var data = await dbContext.Designations.OrderByDescending(x=>x.AutoId).ToListAsync();
             return Json(data);
         }
-
         [HttpPost]
         public async Task<IActionResult> Save(Designation employee)
         {
             if (!ModelState.IsValid)
             return Json(new { success = false });
             string inputName = employee.DesignationName.Trim().ToLower();
-            bool isDuplicate = await dbContext.Designations
-                .AnyAsync(d => d.DesignationName.Trim().ToLower() == inputName && d.DesignationId != employee.DesignationId);
+            //bool isDuplicate = await dbContext.Designations
+            //    .AnyAsync(d => d.DesignationName.Trim().ToLower() == inputName && d.DesignationId != employee.DesignationId);
+            var isDuplicate = IsDuplicate(inputName, employee.DesignationId);
+
             if (isDuplicate)
             {
-                TempData["ErrorMessage"]= "Data alrady exists with this name?";
-                //if (ISPartial)
-                //    return RedirectToAction("EmployeeController1", "Index");
-
                 return RedirectToAction("Index");
             }
 
-                if (employee.AutoId == 0)
-                {
-
+            if (employee.AutoId == 0)
+            {
                 dbContext.Designations.Add(employee);
                 TempData["SuccessMessage"] = "Employee added successfully!";
 
-                }
-        
-                else
+            }
+            else
+            {
+                var existingEmployee = await dbContext.Designations.FindAsync(employee.DesignationId);
+                if (existingEmployee != null)
                 {
-                    var existingEmployee = await dbContext.Designations.FindAsync(employee.DesignationId);
-                    if (existingEmployee != null)
-                    {
-                        existingEmployee.DesignationName = employee.DesignationName;
-                        existingEmployee.DesingnationShortname = employee.DesingnationShortname;
-
-                    }
-                    TempData["SuccessMessage"] = "Data Updated Successfuly!";
-
+                    existingEmployee.DesignationName = employee.DesignationName;
+                    existingEmployee.DesingnationShortname = employee.DesingnationShortname;
                 }
-                await dbContext.SaveChangesAsync();
-               
-                return Json(new { success = true });
-            
-            
+                TempData["SuccessMessage"] = "Data Updated Successfuly!";
+            }
+            await dbContext.SaveChangesAsync();
+            return Json(new { success = true });
         }
         [HttpPost]
         public async Task<IActionResult>Delete(string id)
@@ -86,8 +74,9 @@ namespace EmployeeMvc.Controllers
                 {
                   dbContext.Designations.Remove(designation);
                   await dbContext.SaveChangesAsync();
+                return Json(new {success= true, message = "Designation deleted successfully!" });
                 }
-            return RedirectToAction("Index"); 
+            return Json(new { success = false, message = "Designation not found!" });
         }
         [HttpGet]
         public async Task<IActionResult> GetDesignation(string id)
@@ -99,7 +88,7 @@ namespace EmployeeMvc.Controllers
             }
             return Json(null);
         }
-        private async Task<string> GetDesignationNextID()
+        public async Task<string> GetDesignationNextID()
         {
             var allIds = await dbContext.Designations.Select(d => d.DesignationId).ToListAsync();
 
@@ -125,7 +114,7 @@ namespace EmployeeMvc.Controllers
             {
                 var designation = await dbContext.Designations.FindAsync(id);
                 if (designation != null)
-                {
+                {           
                     dbContext.Designations.Remove(designation);
                 }
             }
@@ -133,18 +122,16 @@ namespace EmployeeMvc.Controllers
             return Ok();
         }
         [HttpPost]
-        public async Task<IActionResult>IsDuplicate(string designationName,string designationId)
+        public bool IsDuplicate(string designationName, string designationId)
         {
             if(string.IsNullOrEmpty(designationName))
             {
-                return Json(false);
+                return (false);
             }
-                
                 string checkName = designationName.Trim().ToLower();
 
-                var isDuplicate = await dbContext.Designations.AnyAsync(d => d.DesignationName.Trim().ToLower() == checkName && d.DesignationId != designationId);
-
-            return Json(isDuplicate); 
+                var isDuplicate = dbContext.Designations.Any(d => d.DesignationName.Trim().ToLower() == checkName /*&& d.DesignationId != designationId*/);
+                 return (isDuplicate); 
         }
         
 

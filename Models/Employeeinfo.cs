@@ -11,16 +11,16 @@ namespace EmployeeMvc.Models
         [StringLength(100)]
         public string Name { get; set; }
         [StringLength(50)]
-        public string Department { get; set; }
-        public DateTime JoiningDate { get; set; }
-        public string Address { get; set; }
-        public string? Email { get; set; }
+        public string? Department { get; set; } = string.Empty;
+        public DateTime? JoiningDate { get; set; } = DateTime.MinValue;
+        public string? Address { get; set; } = string.Empty;
+        public string? Email { get; set; } = string.Empty;
         [StringLength(50)]
-        public string Designation { get; set; }
-        public int GrossSalary { get; set; }
+        public string? Designation { get; set; } = string.Empty;
+        public int? GrossSalary { get; set; } = 0;
         [StringLength (20)]
-        public string? Phone {  get; set; }
-        public string? PhotoPath {  get; set; }
+        public string Phone {  get; set; }
+        public string? PhotoPath {  get; set; } = string.Empty;
         [NotMapped]
         public IFormFile? photo { get; set; }
 

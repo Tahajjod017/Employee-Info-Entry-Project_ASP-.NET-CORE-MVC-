@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EmployeeMvc.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250705042440_Programmer")]
-    partial class Programmer
+    [Migration("20250723121747_afif")]
+    partial class afif
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,7 +28,8 @@ namespace EmployeeMvc.Migrations
             modelBuilder.Entity("EmployeeMvc.Models.Department", b =>
                 {
                     b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
 
                     b.Property<int>("AutoId")
                         .ValueGeneratedOnAdd()
@@ -38,6 +39,10 @@ namespace EmployeeMvc.Migrations
 
                     b.Property<string>("DepartmentName")
                         .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DepartmentShortName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -81,16 +86,13 @@ namespace EmployeeMvc.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AutoID"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Department")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Designation")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -101,10 +103,10 @@ namespace EmployeeMvc.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GrossSalary")
+                    b.Property<int?>("GrossSalary")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("JoiningDate")
+                    b.Property<DateTime?>("JoiningDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -113,6 +115,7 @@ namespace EmployeeMvc.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 

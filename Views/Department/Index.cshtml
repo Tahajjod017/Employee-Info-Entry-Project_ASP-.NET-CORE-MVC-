@@ -1,7 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-
+﻿
 @model List<Department>
 @{
     ViewBag.Title = "Department";
@@ -19,3 +16,310 @@
      @TempData["ErrorMessage"]
  </div>
 }
+<style>
+    .custom-label {
+        width: 18%;
+        text-align: right;
+        padding-right: 10px;
+    }
+
+    .custom-input {
+        width: 28%;
+        margin-right: 4%;
+    }
+
+    .form-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .form-container {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    /* Remove default Bootstrap column constraints */
+    .col-6 {
+        max-width: none;
+        flex: none;
+    }
+</style>
+<!-- ✅ Page Layout -->
+<div width="100" class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h3>Department List</h3>
+                </div>
+                <div class="card-body">
+                    <form id="DepartmentForm" asp-action="Save" method="post">
+                        <div class="row mt-4 text-end">
+                            <div class="col-8 mb-4 text-end">
+                                <button type="button" id="dept-saveBtn" class="btn btn-success me-2">Save</button>
+                                <button type="button" id="dept-deleteBtn" class="btn btn-danger me-2">Delete</button>
+                                <button type="button" id="dept-clearBtn" class="btn btn-secondary me-2">Clear</button>
+                            </div>
+                        </div>
+                        <input type="hidden" asp-for="@(new Department().AutoId)" name="AutoID" value="0" />
+                        <div class="row mt-3">
+                            <!-- Form Container with custom layout -->
+                            <div class="col-12">
+                                <div class="form-container">
+                                    <!-- Department ID: 18% + 28% + 4% = 50% -->
+                                    <label class="custom-label col-form-label mb-3">Department ID<span class="text-danger" style="font-size: 14px;">*</span></label>
+                                    <input type="text" asp-for="@(new Department().DepartmentId)" class="form-control mb-3 custom-input text-center" readonly />
+                                    <div class="col-md-6 mb-3"></div>
+                                    <!-- Department Name: 18% + 28% + 4% = 50% -->
+                                    <label class="custom-label mb-3 col-form-label">Department Name <span class="text-danger" style="font-size:14px;">*</span></label>
+                                    <input type="text" asp-for="@(new Department().DepartmentName)" class="form-control mb-3 custom-input" />
+
+                                    <!-- Short Name: 18% + 28% + 4% = 50% (but remove last 4% margin) -->
+                                    <label class="custom-label mb-3 col-form-label">Short Name <span class="text-danger" style="font-size: 14px;">*</span> </label>
+                                    <input type="text" asp-for="@(new Department().DepartmentShortName)" class="form-control mb-3 custom-input" style="margin-right: 0;" />
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!--Data Grid View-->
+                    <!-- 💡 You can render your department table here -->
+                    <!--Data Grid View-->
+                    <div class="table section">
+                        <div class=" row mb-3">
+                            <div class="col-md-6">
+                                <div class="aling-item-center d-flex">
+                                    <span class="me-2">Grid Show</span>
+                                    <select class="form-select" style="width:80px;">
+                                        <option>10</option>
+                                        <option>25</option>
+                                        <option>50</option>
+                                        <option>100</option>
+                                    </select>
+                                    <span class="ms-2">entries</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-end">
+                                    <input type="text" class="form-control" placeholder="Search" style="width:200px" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="departmentTable" class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="10%" class="text-center">Select All<input type="checkbox" id="selectAll" /> </th>
+                                        <th width="10%" class="text-center">Department ID</th>
+                                        <th width="10%" class="text-center">Department Name</th>
+                                        <th width="10%" class="text-center">Department ShortName</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="Departmenttablebody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+
+        //Loaded and Implemented Table Data//
+        function loadDepartmentTable() {
+            fetch(`/Department/Getall`)
+            .then(response=>response.json())
+            .then(data => {
+                showTableData(data);
+            })
+        }
+
+        function showTableData(data) {
+            const tableBody = document.getElementById('Departmenttablebody');
+            tableBody.innerHTML = ''; // Clear existing rows
+            console.log(data);
+            data.forEach(department => {
+                const row = tableBody.insertRow();
+                row.setAttribute('data-id', department.departmentId);
+
+                //Checkbox column
+                const checkboxCell = row.insertCell(0);
+                checkboxCell.className = "text-center";
+                checkboxCell.style.width = "10%";
+                checkboxCell.innerHTML = `<input type="checkbox" class="selectsingle" name="slectItems" value="${department.departmentId}" />`;
+
+                //Edit link column
+                const idCell = row.insertCell(1);
+                idCell.className ="text-center";
+                idCell.style.width ="10%";
+                idCell.innerHTML = `<a href="javascript:void(0);" class="edit-btn" data-id="${department.departmentId}">${department.departmentId}</a>`;
+
+                //Department Name
+                const nameCell = row.insertCell(2);
+                nameCell.className ="text-center";
+                nameCell.textContent = department.departmentName;
+
+                //Department ShortName
+                const shortnameCell = row.insertCell(3);
+                shortnameCell.className = "text-center";
+                shortnameCell.textContent = department.departmentShortName;
+            })
+        }
+
+        $(document).ready(function(){
+            loadDepartmentTable();
+            GetNextDepartmentId();
+            var departmentId = $('#DepartmentId').val();
+        });
+
+
+        //Save Button Working Method//
+        $('#dept-saveBtn').click(function (e) {
+            e.preventDefault();
+            //Validate form input
+            var data = {
+               DepartmentId: $('#DepartmentId').val(),
+               DepartmentName: $('#DepartmentName').val(),
+               DepartmentShortName: $('#DepartmentShortName').val(),
+               AutoId: $('#AutoId').val()
+            };
+            $.ajax({
+                url:'/Department/Save',
+                type:'POST',
+                data: data,
+                success: function (response){
+                    alert("Save Successful")
+                    reset();
+                    // GetNextDepartmentId ();
+                    // loadDepartmentTable();
+
+                    //Reset the form
+                    $('#DepartmentForm')[0].reset();
+                    if(typeof DepartmentDD === 'function'){
+                        DepartmentDD();
+                    }
+                },
+                error: function() {
+                    alert('Failed to save designation.');
+                }
+            });
+        });
+
+        //GetNextId//
+        function GetNextDepartmentId() {
+            $.ajax({
+                url: '/Department/GetNextDepartmentId',
+                type: 'GET',
+                success: function (data) {
+                    console.log("Next Department ID:", data);
+                    $('#DepartmentId').val(data);
+                },
+                error: function () {
+                    alert('Failed to get next Department ID.');
+                }
+            });
+        }
+        //Edit Button click Handler//
+        $('#departmentTable').on('click','.edit-btn',function(){
+            var departmentId = $(this).data('id');
+            //Get Department Data via AJAX
+            $.ajax({
+                url:'/Department/GetDepartment',
+                type:'GET',
+                data:{id:departmentId},
+                success:function(data){
+                    alert("ID alrady exist")
+                    //Populate the data
+                    $('#DepartmentId').val(data.departmentId);
+                    $('#DepartmentName').val(data.departmentName);
+                    $('#DepartmentShortName').val(data.departmentShortName);
+                    $('#AutoId').val(data.autoId);
+                },
+                error:function(){
+                    alert('Failed to load department data.');
+                }
+            });
+        });
+        //Delete Button Click Hnadler
+        $('#dept-deleteBtn').click(function() {
+            var ids=[];
+            $('.selectsingle:checked').each(function (){
+                ids.push($(this).val());
+                console.log(ids);
+            });
+
+            if(ids.length == 0){
+                var departmentId = $('#DepartmentId').val();
+                if(departmentId && departmentId.trim()!==''){
+                    if(confirm('Are you sure you want to delete this departmentid?')){
+                     $.ajax({
+                         url:`/Department/Delete`,
+                         type:'POST',
+                         data:{id : departmentId},
+                         success: function(response){
+                             if(response.success){
+                                 $('#row_' + departmentId).remove();
+                                 alert('Department Deleted Successfully');
+                                 loadDepartmentTable();
+                                 reset();
+                                 //Reset the form
+                                 $('#DepartmentForm')[0].reset();
+                             }else{
+                                 alert('Department delete failed');
+                             }
+                         },
+                         error:function(){
+                             alert('Something happen when delete operation!');
+                         }
+                     });
+
+                    }else{
+                        alert('Please select a Department')
+                    }   
+                }
+            }else{
+                if(confirm('Are you sure you want to delete this' +ids.length + 'department(s)?'))
+                $.ajax({
+                    url:'/Department/BulkDelete',
+                    type:'POST',
+                    contentType:'application/json',
+                    data:JSON.stringify(ids),
+                    success: function(response){
+                        if(response.success)
+                        alert('Bulk Delete Successfull!');
+                         // loadDepartmentTable();
+						 reset();
+                    },
+                    error:function(){
+                        alert('An error occerd during Delete!')
+                    }
+                });
+            }
+        });
+
+        //Clear Form Data//
+        $('#dept-clearBtn').on('click',function(){
+            reset();
+        });
+        function reset(){
+			$('#DepartmentForm')[0].reset();
+			GetNextDepartmentId();
+			$('#AutoId').val('0');
+			$('.selectsingle').prop('checked',false);
+        }
+
+        //SelectAll Function
+        $('#selectAll').on('click',function(){
+            var isChecked = $(this).prop('checked');
+            console.log(isChecked);
+            $('.selectsingle').prop('checked',isChecked);
+        });
+    </script>
+
+
+}
+
