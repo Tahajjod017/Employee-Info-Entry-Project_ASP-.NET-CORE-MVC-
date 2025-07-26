@@ -81,14 +81,14 @@ namespace EmployeeMvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Image Upload Logic  
-                if (employee.photo != null)
-                {
-                    string? uniqueFileName = GetUploadFileName(employee);
-                    employee.PhotoPath = uniqueFileName;
-                }
                 if (employee.AutoID == 0)
                 {
+                    if (employee.photo != null)
+                    {
+                        string? uniqueFileName = GetUploadFileName(employee);
+                        employee.PhotoPath = uniqueFileName;
+                    }
+
                     var emp = new Employeeinfo();
 
                     emp.EmployeeID = employee.EmployeeID;
@@ -108,17 +108,52 @@ namespace EmployeeMvc.Controllers
                 //dbContext.Employeeinfos.Add(employee);
                 else
                 {
-                    dbContext.Employeeinfos.Update(employee);
+                    var emp = await dbContext.Employeeinfos.FindAsync(employee.AutoID);
+                   
+                    if (emp != null)
+                    {
+                        if (employee.photo != null)
+                        {
+                            if (!string.IsNullOrEmpty(emp.PhotoPath))
+                            {
+                                var photoPath = Path.Combine(webHost.WebRootPath, "Image", Path.GetFileName(emp.PhotoPath));
+                                {
+                                    try
+                                    {
+                                        System.IO.File.Delete(photoPath);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"Error deleting file: {ex.Message}");
+                                    }
+                                }
+                            }
+
+                            string? uniqueFileName = GetUploadFileName(employee);
+                            emp.PhotoPath = uniqueFileName;
+                        }
+
+                        emp.EmployeeID = employee.EmployeeID;
+                        emp.Name = employee.Name;
+                        emp.Phone = employee.Phone;
+                        emp.Department = employee.Department ?? string.Empty;
+                        emp.Designation = employee.Designation ?? string.Empty;
+                        emp.Address = employee.Address ?? string.Empty;
+                        emp.Email = employee.Email ?? string.Empty;
+                        emp.JoiningDate = employee.JoiningDate ?? DateTime.MinValue;
+                        emp.GrossSalary = employee.GrossSalary ?? 0;
+                    }
                 }
                 await dbContext.SaveChangesAsync();
             }
+
 
             return RedirectToAction("Index");
         }
 
         private string? GetUploadFileName(Employeeinfo emp)
         {
-            string uniqueFileName = null;
+            string? uniqueFileName = null;
             if (emp.photo != null)
             {
                 var uploadsFolder = Path.Combine(webHost.WebRootPath, "Image");
