@@ -12,6 +12,7 @@ namespace EmployeeMvc.Models
         public string Name { get; set; }
         [StringLength(50)]
         public string? Department { get; set; } = string.Empty;
+        public string? DevSkills { get; set; } = string.Empty;
         public DateTime? JoiningDate { get; set; } = DateTime.MinValue;
         public string? Address { get; set; } = string.Empty;
         public string? Email { get; set; } = string.Empty;
@@ -23,6 +24,8 @@ namespace EmployeeMvc.Models
         public string? PhotoPath {  get; set; } = string.Empty;
         [NotMapped]
         public IFormFile? photo { get; set; }
+
+
 
     }
 }

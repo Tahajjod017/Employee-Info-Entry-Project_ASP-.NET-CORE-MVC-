@@ -92,7 +92,7 @@
 							</div>
 							<div class="col-md-6">
 								<div class="d-flex justify-content-end">
-									<input type="text" class="form-control" placeholder="Search" style="width:200px" />
+									<input type="text" class="form-control" id="SearchDesignation" placeholder="Search" style="width:200px" />
 								</div>
 							</div>
 						</div>
@@ -258,14 +258,21 @@
 				}
 			});
 		});
-		function loadDesignationTable(){
-			fetch(`/Designation/Getall`)
-			.then(response=>response.json())
-			.then(data => {
-				showTableData(data);
-			})
-		}
 
+		$('#SearchDesignation').on('input', function () {
+		loadDesignationTable();
+	    });
+
+			function loadDesignationTable() {
+		var searchitem = $('#SearchDesignation').val();
+		fetch(`/Designation/Getall?search=${encodeURIComponent(searchitem)}`)
+			.then(response => response.json())
+			.then(data => {
+				showTableData(data); // Display filtered data
+			});
+	}
+
+		//
 		function showTableData(data) {
 			const tableBody = document.getElementById('Designationtablebody');
 			tableBody.innerHTML = "";

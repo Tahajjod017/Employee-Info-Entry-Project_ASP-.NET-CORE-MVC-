@@ -40,8 +40,9 @@ namespace EmployeeMvc.Controllers
         public async Task<IActionResult> Save(Department department)
         {
             if (!ModelState.IsValid)
+            {
                 return Json(new { success = false });
-                RedirectToAction("Index");
+            }
             string inputName = department.DepartmentName.Trim().ToLower();
             bool isDuplicate = await dBContext.Departments.AnyAsync(d => d.DepartmentName.Trim().ToLower() == inputName && d.DepartmentId != department.DepartmentId);
 

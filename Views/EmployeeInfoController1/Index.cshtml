@@ -1,604 +1,1178 @@
 ﻿@model Employeeinfo
 
 @{
-    ViewData["Title"] = "Employee Information Entry";
-    var departments = ViewBag.Departments as List<EmployeeMvc.Models.Department>;
-    var designations = ViewBag.Designation as List<EmployeeMvc.Models.Designation>;
-    var employee = ViewBag.emp as List<EmployeeMvc.Models.Employeeinfo>;
+	ViewData["Title"] = "Employee Information Entry";
+	var departments = ViewBag.Departments as List<EmployeeMvc.Models.Department>;
+	var designations = ViewBag.Designation as List<EmployeeMvc.Models.Designation>;
+	var employee = ViewBag.emp as List<EmployeeMvc.Models.Employeeinfo>;
 }
 <style>
-    .pagination-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
+	.pagination-section {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 15px;
 
-    }
+
+	}
+
+	#employeeTable td:nth-child(8),
+	#employeeTable td:nth-child(7),
+	#employeeTable td:nth-child(2),
+	#employeeTable td:nth-child(9){
+		text-align:center;
+		vertical-align:middle;
+	}
+	#employeeTable td:nth-child(6){
+		text-align:right;
+		font-weight: bold;
+	}
+	#employeeTable td:nth-child(3),
+	#employeeTable td:nth-child(4),
+	#employeeTable td:nth-child(5){
+		text-align:left
+	}
+
+	#employeeTable th:nth-child(6),
+	#employeeTable td:nth-child(6) {
+		width: 130px;
+		text-align: right;
+	}
+
+	/* #DevelopmentSkills { */
+	/* 	height: auto; */
+	/* 	min-height: 38px; */
+	/* } */
+
+	/* 	#DevelopmentSkills option:checked { */
+	/* 		background-color: #007bff; */
+	/* 		color: white; */
+	/* 	} */
+
+
+	/* custom-multiselect { */
+	/* 	position: relative; */
+	/* 	width: 100%; */
+	/* } */
+
+	/* .multiselect-input-wrapper { */
+	/* 	position: relative; */
+	/* 	display: flex; */
+	/* 	align-items: center; */
+	/* } */
+
+	/* .multiselect-display { */
+	/* 	cursor: pointer; */
+	/* 	background-color: white !important; */
+	/* 	border: 1px solid #ced4da; */
+	/* 	border-radius: 4px; */
+	/* 	padding-right: 30px; */
+	/* } */
+
+	/* .dropdown-arrow { */
+	/* 	position: absolute; */
+	/* 	right: 8px; */
+	/* 	cursor: pointer; */
+	/* 	user-select: none; */
+	/* 	color: #6c757d; */
+	/* 	font-size: 12px; */
+	/* } */
+
+	/* .multiselect-dropdown-list { */
+	/* 	display: none; */
+	/* 	position: absolute; */
+	/* 	top: 100%; */
+	/* 	left: 0; */
+	/* 	right: 0; */
+	/* 	background-color: white; */
+	/* 	border: 1px solid #ced4da; */
+	/* 	border-top: none; */
+	/* 	border-radius: 0 0 4px 4px; */
+	/* 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+	/* 	max-height: 200px; */
+	/* 	overflow-y: auto; */
+	/* 	z-index: 1000; */
+	/* } */
+
+	/* 	.multiselect-dropdown-list.show { */
+	/* 		display: block; */
+	/* 	} */
+
+	/* .multiselect-option { */
+	/* 	display: flex; */
+	/* 	align-items: center; */
+	/* 	padding: 6px 12px; */
+	/* 	cursor: pointer; */
+	/* 	border-bottom: 1px solid #f8f9fa; */
+	/* } */
+
+	/* 	.multiselect-option:hover { */
+	/* 		background-color: #f8f9fa; */
+	/* 	} */
+
+	/* 	.multiselect-option:last-child { */
+	/* 		border-bottom: none; */
+	/* 	} */
+
+	/* 	.multiselect-option input[type="checkbox"] { */
+	/* 		margin: 0 8px 0 0; */
+	/* 		cursor: pointer; */
+	/* 	} */
+
+	/* 	.multiselect-option label { */
+	/* 		margin: 0; */
+	/* 		cursor: pointer; */
+	/* 		font-weight: normal; */
+	/* 		flex: 1; */
+	/* 	} */
+
+	/* .multiselect-display:focus { */
+	/* 	box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); */
+	/* 	border-color: #80bdff; */
+	/* 	outline: 0; */
+	/* } */
+
+	/* /* Scrollbar styling */ */
+	/* .multiselect-dropdown-list::-webkit-scrollbar { */
+	/* 	width: 6px; */
+	/* } */
+
+	/* .multiselect-dropdown-list::-webkit-scrollbar-track { */
+	/* 	background: #f1f1f1; */
+	/* } */
+
+	/* .multiselect-dropdown-list::-webkit-scrollbar-thumb { */
+	/* 	background: #c1c1c1; */
+	/* 	border-radius: 3px; */
+	/* } */
+
+	/* 	.multiselect-dropdown-list::-webkit-scrollbar-thumb:hover { */
+	/* 		background: #a1a1a1; */
+	/* 	} */
+
 </style>
+
 <div width="100%" class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-white ">
-                    <h4>Employee Information Entry</h4>
-                </div>
-                <div class="card-body">
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header bg-white ">
+					<h4>Employee Information Entry</h4>
+				</div>
+				<div class="card-body">
 
-                    <form id="employeeForm" @* asp-action="Save" method="post" *@>
-                        <div class="row mt-2">
-                            <div class="col-9 mb-4 text-end">
-                                <button type="submit" id="saveBtn" class="btn btn-lg btn-success me-2">Save</button>
-                                <button type="button" id="deleteBtn" class="btn btn-lg btn-danger me-2">Delete</button>
-                                <button type="button" id="clearBtn" class="btn btn-lg btn-secondary">Clear</button>
-                            </div>
-                        </div>
-                        <input type="hidden" asp-for="AutoID" name="AutoID" value="0" />
-                        <div class="row">
-                            <!-- Left Column (Form Fields) - col-10 -->
-                            <div class="col-10">
-                                <!-- Row 1: Employee ID | Empty -->
-                                <div class="row mb-3">
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Employee ID</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" asp-for="EmployeeID" class="form-control" readonly/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <!-- Empty -->
-                                    </div>
-                                </div>
-                                <!-- Row 2: Name | Designation -->
-                                <div class="row mb-3">
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Name:</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" asp-for="Name" name="Name" class="form-control" required oninvalid="this.setCustomValidity('Please Enter Your Name')"
-                                                oninput="this.setCustomValidity('')"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Designation:</label>
-                                            <div class="col-sm-7">
-                                                <select asp-for="Designation" name="Designation" class="form-control" >
-                                                    <option value= "">Choose</option >
-                                                    @* @if (designations != null)
-                                                    {
-                                                        foreach (var designation in designations)
-                                                        {
-                                                            <option value="@designation.DesignationId.ToString()">@designation.DesignationName</option>
-                                                        }
-                                                    } *@
-                                                </select>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <span class="text-success"></span>
-                                                <button type="button" id="loadDesignationModal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">+
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+					<form id="employeeForm" @* asp-action="Save" method="post" *@>
+						<div class="row mt-2">
+							<div class="col-9 mb-4 text-end">
+								<button type="submit" id="saveBtn" class="btn btn-lg btn-success me-2">Save</button>
+								<button type="button" id="deleteBtn" class="btn btn-lg btn-danger me-2">Delete</button>
+								<button type="button" id="clearBtn" class="btn btn-lg btn-secondary">Clear</button>
+							</div>
+						</div>
+						<input type="hidden" asp-for="AutoID" name="AutoID" value="0" />
+						<div class="row">
+							<!-- Left Column (Form Fields) - col-10 -->
+							<div class="col-10">
+								<!-- Row 1: Employee ID | Empty -->
+								<div class="row mb-3">
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Employee ID</label>
+											<div class="col-sm-7">
+												<input type="text" asp-for="EmployeeID" class="form-control" readonly />
+											</div>
+											<div class="col-sm-1">
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<!-- Empty -->
+									</div>
+								</div>
+								<!-- Row 2: Name | Empty -->
+								<div class="row mb-3">
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Name:</label>
+											<div class="col-sm-7">
+												<input type="text" asp-for="Name" name="Name" class="form-control" required oninvalid="this.setCustomValidity('Please Enter Your Name')"
+													   oninput="this.setCustomValidity('')" />
+											</div>
+											<div class="col-sm-1">
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<!-- Empty -->
+									</div>
+								</div>
+								<div class="row mb-3">
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Development Skills:</label>
+											<div class="col-sm-7">
+												<select Asp-for="DevSkills" name="DevSkills" class="form-control" multiple="multiple"></select>
+											</div>
+											<div class="col-sm-1">
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<!-- Empty -->
+									</div>
+								</div>
 
-                                <!-- Row 3: Department | Salary -->
-                                <div class="row mb-3">
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Department:</label>
-                                            <div class="col-sm-7">
-                                                <select asp-for="Department" name="Department" class="form-control">
-                                                    @if (departments != null)
-                                                    {
-                                                        foreach (var dept in departments)
-                                                        {     
-                                                            <option value="">Select Department</option>
-                                                            <option value="@dept.DepartmentId.ToString()">@dept.DepartmentName</option>
-                                                        }
-                                                    }
-                                                </select>
-                                            </div>
-                                            <div class="col-sm-1">
 
-                                                <span class="text-success">
-                                                    <button type="button" id= "loadDepartmentModal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#DepartmentModal">
-                                                        +
-                                                    </button>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Gross Salary:</label>
-                                            <div class="col-sm-8">
-                                                <input type="number" id="GrossSalary" name="GrossSalary" class="form-control" step="1" Fixed min="0"  />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+								<!-- Row 4: Designation | Department -->
+								<div class="row mb-3">
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Designation:</label>
+											<div class="col-sm-7">
+												<select asp-for="Designation" name="Designation" class="form-control">
+												</select>
+											</div>
+											<div class="col-sm-1">
+												<button type="button" id="loadDesignationModal" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+													+
+												</button>
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Department:</label>
+											<div class="col-sm-7">
+												<select asp-for="Department" name="Department" class="form-control">
+												</select>
+											</div>
+											<div class="col-sm-1">
+												<button type="button" id="loadDepartmentModal" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#DepartmentModal">
+													+
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
 
-                                <!-- Row 4: Joining Date | Empty -->
-                                <div class="row mb-3">
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Joining Date:</label>
-                                            <div class="col-sm-8">
-                                                <input type="date" id="JoiningDate" name="JoiningDate" class="form-control"  />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <!-- Empty -->
-                                    </div>
-                                </div>
+								<!-- Row 5: Empty | Gross Salary -->
+								<div class="row mb-3">
+									<div class="col-6">
+										<!-- Empty -->
+									</div>
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Gross Salary:</label>
+											<div class="col-sm-7">
+												<input type="number" id="GrossSalary" name="GrossSalary" class="form-control" step="1" Fixed min="0" />
+											</div>
+											<div class="col-sm-1">
+											</div>
+										</div>
+									</div>
+								</div>
 
-                                <!-- Row 5: Address | Phone -->
-                                <div class="row mb-3">
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Address:</label>
-                                            <div class="col-sm-8">
-                                                <textarea id="Address" name="Address" class="form-control" rows="3"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Phone:</label>
-                                            <div class="col-sm-8">
-                                                <input type="tel" id="Phone" name="Phone" class="form-control" required oninvalid="this.setCustomValidity('Please Enter Phone')" oninput="this.setCustomValidity('')" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+								<!-- Row 6: Joining Date | Empty -->
+								<div class="row mb-3">
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Joining Date:</label>
+											<div class="col-sm-7">
+												<input type="date" id="JoiningDate" name="JoiningDate" class="form-control" />
+											</div>
+											<div class="col-sm-1">
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<!-- Empty -->
+									</div>
+								</div>
 
-                                <!-- Row 6: Email | Photo Upload -->
-                                <div class="row mb-3">
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Email:</label>
-                                            <div class="col-sm-8">
-                                                <input type="email" id="Email" name="Email" class="form-control"  />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label text-end">Photo:</label>
-                                            <div class="col-sm-6">
-                                                <input asp-for="photo" type="file" class="form-control" accept="image/*" />
-                                                @* <input type="hidden" id="Photo" name="Photo" /> *@
-                                            </div>
+								<!-- Row 7: Address | Phone -->
+								<div class="row mb-3">
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Address:</label>
+											<div class="col-sm-7">
+												<textarea id="Address" name="Address" class="form-control" rows="3"></textarea>
+											</div>
+											<div class="col-sm-1">
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Phone:</label>
+											<div class="col-sm-7">
+												<input type="tel" asp-for="Phone" id="Phone" name="Phone" class="form-control" required oninvalid="this.setCustomValidity('Please Enter Phone?')" oninput="this.setCustomValidity('')" />
+											</div>
+											<div class="col-sm-1">
+											</div>
+										</div>
+									</div>
+								</div>
 
-                                        </div>
-                                    </div>
-                                </div>
+								<!-- Row 8: Email | Photo Upload -->
+								<div class="row mb-3">
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Email:</label>
+											<div class="col-sm-7">
+												<input type="email" id="Email" name="Email" class="form-control" />
+											</div>
+											<div class="col-sm-1">
+											</div>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="row">
+											<label class="col-sm-4 col-form-label text-end">Photo:</label>
+											<div class="col-sm-7">
+												<input asp-for="photo" type="file" class="form-control" accept="image/*" />
+												@* <input type="hidden" id="Photo" name="Photo" /> *@
+											</div>
+											<div class="col-sm-1">
+											</div>
+										</div>
+									</div>
+								</div>
 
-                            </div>
+							</div>
 
-                            <!-- Right Column (Photo Preview) - col-2 -->
-                            <div class="col-2">
-                                <div class="text-center">
-                                    <label class="form-label">Photo Preview:</label>
-                                    <div class="border mt-2" style="width: 100%; height: 150px;">
-                                        <img id="photoPreview" src="" alt="Photo Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
-                                        <div id="photoPlaceholder" class="d-flex align-items-center justify-content-center h-100">
-                                            <span class="text-muted" id="photoPHText">Insert Photo</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-12 text-center mt-3">
-                                        <button type="button" id="pic_clearBtn" class="btn btn-sm btn-outline-secondary w-50">Clear</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                    <!--Employee Data Grid View-->
-                    <div class="table-responsive"></div>
-                    <div class=" table section">
-                        <div class=" row mb-3">
-                            <div class=" col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <span class="me-2">Grid Show:</span>
-                                    <select class="form-select"style="width:80px;">
-                                        <option>10</option>
-                                        <option>25</option>
-                                        <option>50</option>
-                                        <option>100</option>                                    
-                                    </select>
-                                    <span class="ms-2">entries</span> 
-                                </div>
-                            </div>
-                            <div class="col-md-6"> 
-                                <div class="d-flex justify-content-end">
-                                    <input type="text" class="form-control" placeholder="Search" style="width:200px" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="employeeTable" class="table table-bordered">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th width="10%" class="text-center">Select All <input type="checkbox" id="selectAll" /></th>
-                                        <th>Emp.ID</th>
-                                        <th>Name</th>
-                                        <th>Designation</th>
-                                        <th>Department</th>
-                                        <th>GrossSalary</th>
-                                        <th>JoiningDate</th>
-                                        <th style="width: 80px; text-align: center;"> Photo </th>
-                                        <th>action</th>
-                                    </tr>
-                                </thead>
+							<!-- Right Column (Photo Preview) - col-2 -->
+							<div class="col-2">
+								<div class="text-center">
+									<label class="form-label">Photo Preview:</label>
+									<div class="border mt-2" style="width: 100%; height: 150px;">
+										<img id="photoPreview" src="" alt="Photo Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+										<div id="photoPlaceholder" class="d-flex align-items-center justify-content-center h-100">
+											<span class="text-muted" id="photoPHText">Insert Photo</span>
+										</div>
+									</div>
+								</div>
+								<div class="row mb-3">
+									<div class="col-12 text-center mt-3">
+										<button type="button" id="pic_clearBtn" class="btn btn-sm btn-outline-secondary w-50">Clear</button>
+									</div>
+								</div>
+							</div>
+						</div>
+				</form>
+					<!--Employee Data Grid View-->
+					<div class="table-responsive"></div>
+					<div class=" table section">
+						<div class=" row mb-3">
+							<div class=" col-md-6">
+								<div class="d-flex align-items-center">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="d-flex justify-content-end">
+								@* 	<input type="text" class="form-control" placeholder="Search" id="SearchEmp" style="width:200px" /> *@
+								</div>
+							</div>
+						</div>
+						<div class="table-responsive">
+							<table id="employeeTable" class="table table-bordered">
+								<thead class="table-light">
+									<tr>
+										<th style="width: 60px; text-align: center;">Select <input type="checkbox" id="selectAll" /></th>
+										<th style="width: 90px; text-align: center;">Emp ID</th>
+										<th style="width: 150px; text-align: center;">Name</th>
+										<th style="width:150px;text-align:center">Designation</th>
+										<th style="width: 160px; text-align: center;">Department</th>
+										<th style="width: 150px; text-align: right;">Gross Salary</th>
+										<th style="width: 150px; text-align: center;">Joining Date</th>
+										<th style="width:100px;text-align:center;">Phone</th>
+										<th style="width: 80px; text-align: center;"> Photo </th>
+										<th>Action</th>
 
-                                <tbody>
-                                    @if (ViewBag.emp != null)
-                                    {
-                                        foreach (var emp in ViewBag.emp)
-                                        {
-                                            <tr>
-                                                <td class="text-center" width="10%"><input type="checkbox" class="selectsingle" name="selectedItems" value="@emp.AutoID"/></td>
-                                                <td>@emp.EmployeeID</td>
-                                                <td>@emp.Name</td>
-                                                <td>@emp.Designation</td>
-                                                <td>@emp.Department</td>
-                                                <td>@emp.GrossSalary</td>
-                                                <td>@emp.JoiningDate?.ToString("yyyy-MM-dd")</td>
+									</tr>
+								</thead>
 
-                                                <td>
-                                                    @if (!string.IsNullOrEmpty(emp.PhotoPath))
-                                                    {
-                                                        <img src="~/Image/@emp.PhotoPath" alt="Employee Photo"
-                                                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;"
-                                                             class="img-thumbnail"  />
-                                                    }
-                                                    else
-                                                    {
+								<tbody id="employeeTableBody">
+									@* @if (ViewBag.emp != null)
+									{
+										foreach (var emp in ViewBag.emp)
+										{
+											<tr>
+												<td class="text-center" width="10%"><input type="checkbox" class="selectsingle" name="selectedItems" value="@emp.AutoID" /></td>
+												<td>@emp.EmployeeID</td>
+												<td>@emp.Name</td>
+												<td>@emp.Designation</td>
+												<td>@emp.Department</td>
+												<td>@emp.GrossSalary</td>
+												<td>@emp.JoiningDate?.ToString("yyyy-MM-dd")</td>
+												<td>@emp.Phone</td>
 
-                                                        <span class="text-muted align-content-center w-50">👤</span>    
-                                                    }
-                                                </td>
-                                                <td><button type="button" class="editBtn btn btn-sm btn-outline-secondary w-10%" data-id =@emp.EmployeeID>Edit</button></td>
 
-                                            </tr>
-                                        }
-                                    }
-                                    else
-                                    {
-			                    	    <tr>
+
+												<td>
+													@if (!string.IsNullOrEmpty(emp.PhotoPath))
+													{
+														<img src="~/Image/@emp.PhotoPath" alt="Employee Photo"
+															 style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;"
+															 class="img-thumbnail" />
+													}
+													else
+													{
+
+														<span class="text-muted align-content-center w-50">👤</span>
+													}
+												</td>
+												<td><button type="button" class="editBtn btn btn-sm btn-outline-secondary w-10%" data-id=@emp.EmployeeID>Edit</button></td>
+
+
+
+											</tr>
+										}
+									}
+									else
+									{
+										<tr>
 											<td>No Data found</td>
-                                        </tr>
-                                    }
+										</tr>
+									}
+ *@
+								</tbody>
 
-                               </tbody>
+							</table>
+						</div>
+						@* <div class="pagination-section">
+							<div>
+								<span class="text-muted">Showing 1 to 10 of 15 entries</span>
+							</div>
+							<nav>
+								<ul class="pagination mb-0">
+									<li class="page-item">
+										<a class="page-link" href="#">First</a>
+									</li>
+									<li class="page-item">
+										<a class="page-link" href="#">Previous</a>
+									</li>
+									<li class="page-item">
+										<a class="page-link" href="#">Previous</a>
 
-                           </table>
-                       </div>
-                       <div class="pagination-section">
-                           <div>
-                               <span class="text-muted">Showing 1 to 10 of 15 entries</span>
-                           </div>
-                           <nav>
-                               <ul class="pagination mb-0">
-                                   <li class="page-item">
-                                   <a class="page-link"href="#">First</a>
-                                   </li>
-                                   <li class="page-item">
-                                       <a class="page-link"href="#">Previous</a>
-                                   </li>
-                                   <li class="page-item">
-                                       <a class="page-link"href="#">Previous</a>
+									</li>
+									<li class="page-item">
+										<a class="page-link" href="#">1</a>
 
-                                   </li>
-                                   <li class="page-item">
-                                       <a class="page-link"href="#">1</a>
+									</li>
+									<li class="page-item">
+										<a class="page-link" href="#">2</a>
+									</li>
+									<li class="page-item">
+										<a class="page-link" href="#">Next</a>
 
-                                   </li>
-                                   <li class="page-item">
-                                       <a class="page-link"href="#">2</a>
-                                   </li>
-                                   <li class="page-item">
-                                       <a class="page-link"href="#">Next</a>
-
-                                   </li>
-                                   <li class="page-item">
-                                       <a class="page-link"href="#">Last</a>
-                                   </li>
-                               </ul>
-                           </nav>
-                       </div>
-                    </div>
-                    <div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+									</li>
+									<li class="page-item">
+										<a class="page-link" href="#">Last</a>
+									</li>
+								</ul>
+							</nav>
+						 *@</div>
+					</div>
+					<div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <!--Designation Modal-->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="desigModalBody">        
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body" id="desigModalBody">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary">Save changes</button>
+			</div>
+		</div>
+	</div>
 </div>
 <!--Department Modal-->
 <div class="modal fade" id="DepartmentModal" tabindex="-1" aria-labelledby="DepartmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="DepartmentModalLabel">Modal title</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="DepartmentModalBody">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="DepartmentModalLabel">Modal title</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body" id="DepartmentModalBody">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary">Save changes</button>
+			</div>
+		</div>
+	</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-<script>
-    $(document).ready(function () {
-        // Initial Data Loads
-        DesignationDD();
-        DepartmentDD();
-        GetEmployeeNextID();
-
-        // Modal Load Events
-        $('#loadDesignationModal').on('click', function () {
-            $('#desigModalBody').load('/Designation/Index?isPartial=true', function () {
-                DesignationDD(); // Optional: reload if modal content includes dropdown
-            });
-        });
-        $('#loadDepartmentModal').on('click', function () {
-            $('#DepartmentModalBody').load('/Department/Index?isPartial=true', function () {
-                DepartmentDD(); // Optional: reload if modal content includes dropdown
-            });
-        });
-    });
-
-    // 🔄 Load Designations
-    function DesignationDD() {
-        $.get('/Designation/GetAll', function (designations) {
-            var $dropdown = $('#Designation');
-            $dropdown.empty();
-
-            $dropdown.append($('<option>', {
-                value: '',
-                text: 'Select Designation...',
-                disabled: true,
-                selected: true
-            }));
-
-            $.each(designations, function (i, item) {
-                $dropdown.append($('<option>', {
-                    value: item.designationId,
-                    text: item.designationName
-                }));
-            });
-        });
-    }
-
-    // 🔄 Load Departments
-    function DepartmentDD() {
-        $.get('/Department/GetAll', function (departments) {
-            var $dropdown = $('#Department');
-            $dropdown.empty();
-            
-            $dropdown.append($('<option>', {
-                value: '',
-                text: 'Select Department...',
-                disabled: true,
-                selected: true
-            }));
-
-            $.each(departments, function (i, item) {
-                $dropdown.append($('<option>', {
-                    value: item.departmentId,
-                    text: item.departmentName
-                }));
-            });
-        });
-    }
-
-    // 📄 Auto-generate Next Employee ID
-    function GetEmployeeNextID() {
-        $.ajax({
-            url: 'EmployeeInfoController1/GetEmployeeNextID',
-            type: 'GET',
-            success: function (data) {
-                console.log("Next Employee ID:", data);
-                $('#EmployeeID').val(data);
-            },
-            error: function () {
-                alert('Failed to get Employee Next ID');
-            }
-        });
-    }
-    $('#photo').on('change', function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                $('#photoPreview').attr('src', e.target.result).show();
-                $('#photoPlaceholder').hide();
-                $('#photoPHText').hide();
-
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-    
-
-     $('#clearBtn').on('click',function(){
-         clear();
-     });
-    function clear(){
-        $('#employeeForm')[0].reset();      
-        $('#AutoID').val('0');
-        GetEmployeeNextID();
-        $('#photoPlaceholder').show();
-        $('#photoPHText').show();
-        $('#photoPreview').attr('src', '').hide();
-
-    }
-    $('#pic_clearBtn') .on('click',function(){
-         $('#photoPlaceholder').show();
-         $('#photoPHText').show();
-        $('#photoPreview').attr('src', '').hide();
-        $('#photo').val('');
-        
-    });
-
-    // Photo Edit Button
-    $('#employeeTable').on('click','.editBtn', function() {
-        var employeeId = $(this).data('id');
-        $.ajax({
-            url:'/EmployeeInfoController1/GetById',
-            type:'GET',
-            data:{id: employeeId},
-            success:function(data){
-                if(data){
-                    console.log(data);
-                    if(data.photoPath != null){
-                        $('#photoPlaceholder').hide();
-                        $('#photoPHText').hide();
-                        $('#photoPreview').attr('src', `Image/${data.photoPath}`).show();
-                    } else{
-                        $('#photoPlaceholder').show();
-                        $('#photoPHText').show();
-                        $('#photoPreview').attr('src', '').hide();
-                    }
-                    $('#EmployeeID').val(data.employeeID);
-                    $('#AutoID').val(data.autoID);
-                    $('#Name').val(data.name);
-                    $('#Designation').val(data.designation);
-                    $('#Department').val(data.department);
-                    $('#GrossSalary').val(data.grossSalary);
-                    $('#JoiningDate').val(data.joiningDate.split('T')[0]);
-                    $('#Address').val(data.address);
-                    $('#Phone').val(data.phone);
-                    $('#Email').val(data.email);
-                }
-            },
-            error: function(){
-                alert('Not Found')
-            }
-        });
-
-    });
-
-
-    // function submitFormWithAjax() {
-        $('#employeeForm').on('submit', function(e) {
-            e.preventDefault(); // Prevent normal form submission
-
-            const formData = new FormData(this);
-            
-            $.ajax({
-                url: 'EmployeeInfoController1/Save',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    console.log('Success:', response);
-                    alert('Employee saved successfully!');
-                    clear();
-                    // Reload the employee list or redirect
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error);
-                    alert('Error saving employee: ' + error);
-                }
-            });
-        });
-
-            $('#deleteBtn').click(function () {
-        var ids = [];
-        $('.selectsingle:checked').each(function () {
-            ids.push($(this).val());
-            console.log(ids);
-        });
-        if (ids.length == 0) {
-            var employeeId = $('#AutoID').val();
-            if (employeeId && employeeId.trim() !== '') {
-                if (confirm('Are you sure you want to delete this employee?')) {
-                    $.ajax({
-                        url: '/EmployeeInfoController1/Delete',
-                        type: 'POST',
-                        data: { id: employeeId },
-                        success: function (response) {
-                            if (response.success) {
-                                $('#row_' + employeeId).remove();
-                                alert('Employee Deleted successfully');
-                                 location.reload();
-                                $('#employeeForm')[0].reset();
-                            } else {
-                                alert('Error deleting employee');
-                            }
-                        },
-                        error: function () {
-                            alert('Error deleting employee');
-                        }
-                    });
-                }
-            } else {
-                alert('Please select an employee to delete');
-            }
-        } else {
-            if (confirm('Are you sure you want to delete this ' + ids.length + ' employees?')) {
-                $.ajax({
-                    url: '/EmployeeInfoController1/BulkDelete',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(ids),
-                    success: function (response) {
-                        if (response.success) {
-                            alert('Employees deleted successfully');
-                            location.reload();
-                        }
-                    },
-                    error: function () {
-                        alert('Error detecting while deleting employees');
-                    }
-                });
-            }
-        }
-    });
-    $('#selectAll').on ('click',function(){
-        var isChecked = $(this).prop('checked');
-        console.log(isChecked);
-        $('.selectsingle').prop('checked',isChecked);
-    });
 
 
 
+@section Scripts {
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-    // }
-</script>
+	<!-- Bootstrap Multiselect CSS -->
+	<!-- Remove the old bootstrap-multiselect lines and use this instead -->
+	<!-- Bootstrap Multiselect CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/css/bootstrap-multiselect.min.css">
 
+	<!-- Bootstrap Multiselect JS (after jQuery and Bootstrap JS) -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/js/bootstrap-multiselect.min.js"></script>
+	<script>
+
+				$(document).ready(function () {
+					// Initial Data Loads
+					DevDD();
+					DesignationDD();
+					DepartmentDD();
+					GetEmployeeNextID();
+					Name.focus();
+					
+					// Modal Load Events
+					$('#loadDesignationModal').on('click', function () {
+						$('#desigModalBody').load('/Designation/Index?isPartial=true', function () {
+							DesignationDD(); // Optional: reload if modal content includes dropdown
+						});
+					});
+					$('#loadDepartmentModal').on('click', function () {
+						$('#DepartmentModalBody').load('/Department/Index?isPartial=true', function () {
+							DepartmentDD(); // Optional: reload if modal content includes dropdown
+						});
+					});
+				});
+
+				// 🔄 Load Designations
+				function DesignationDD() {
+					$.get('/Designation/GetAll', function (designations) {
+						var $dropdown = $('#Designation');
+						$dropdown.empty();
+
+						$dropdown.append($('<option>', {
+							value: '',
+							text: 'Select Designation...',
+							disabled: true,
+							selected: true
+						}));
+
+						$.each(designations, function (i, item) {
+							$dropdown.append($('<option>', {
+								value: item.designationId,
+								text: item.designationName
+							}));
+						});
+
+					});
+				}
+				//Development Skills 
+						function DevDD() {
+									$.get('/EmployeeInfoController1/GetallDev', function (designations) {
+								var $dropdown = $('#DevSkills');
+
+						if ($dropdown.data('multiselect')) {
+							$dropdown.multiselect('destroy');
+						}
+
+						$dropdown.empty();
+
+						$.each(designations, function (i, item) {
+							$dropdown.append($('<option>', {
+										value: item.devId,
+										text: item.devName
+							}));
+						});
+
+					$dropdown.multiselect({
+					includeSelectAllOption: true,
+					selectAllText: 'Select All',
+					nonSelectedText: 'Select DevSkills',
+					nSelectedText: ' selected',
+					allSelectedText: 'All selected',
+					numberDisplayed: 2,
+					enableFiltering: true,
+					filterPlaceholder: 'Search devskills',
+					maxHeight: 300,
+					buttonWidth: '100%',
+					buttonClass: 'form-control text-start',
+					templates: {
+						button: '<button type="button"  class="multiselect dropdown-toggle" data-bs-toggle="dropdown"><span class="multiselect-selected-text"></span></button>',
+						ul: '<ul class="multiselect-container dropdown-menu"></ul>',
+						filter: '<li class="multiselect-item multiselect-filter"><div class="input-group"><input class="form-control multiselect-search" type="text" placeholder="Search..."></div></li>',
+						filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="fa fa-times"></i></button></span>',
+						li: '<li><a tabindex="0"><label></label></a></li>',
+						divider: '<li class="multiselect-item divider"></li>',
+						liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
+					}
+				});
+					});
+				}
+
+				// 🔄 Load Departments
+				function DepartmentDD() {
+					$.get('/Department/GetAll', function (departments) {
+						var $dropdown = $('#Department');
+						$dropdown.empty();
+
+						$dropdown.append($('<option>', {
+							value: '',
+							text: 'Select Department...',
+							disabled: true,
+							selected: true
+						}));
+
+						$.each(departments, function (i, item) {
+							$dropdown.append($('<option>', {
+								value: item.departmentId,
+								text: item.departmentName
+							}));
+						});
+					});
+				}
+
+				// 📄 Auto-generate Next Employee ID
+				function GetEmployeeNextID() {
+					$.ajax({
+						url: 'EmployeeInfoController1/GetEmployeeNextID',
+						type: 'GET',
+						success: function (data) {
+							console.log("Next Employee ID:", data);
+							$('#EmployeeID').val(data);
+						},
+						error: function () {
+							alert('Failed to get Employee Next ID');
+						}
+					});
+				}
+				$('#photo').on('change', function (event) {
+					const file = event.target.files[0];
+					if (file) {
+						const reader = new FileReader();
+						reader.onload = function (e) {
+							$('#photoPreview').attr('src', e.target.result).show();
+							$('#photoPlaceholder').hide();
+							$('#photoPHText').hide();
+
+						};
+						reader.readAsDataURL(file);
+					}
+				});
+
+
+				 $('#clearBtn').on('click',function(){
+					 clear();
+				 });
+				function clear(){
+					$('#employeeForm')[0].reset();
+					$('#AutoID').val('0');
+					GetEmployeeNextID();
+					$('#photoPlaceholder').show();
+					$('#photoPHText').show();
+					$('#photoPreview').attr('src', '').hide();
+
+				}
+				$('#pic_clearBtn') .on('click',function(){
+					 $('#photoPlaceholder').show();
+					 $('#photoPHText').show();
+					$('#photoPreview').attr('src', '').hide();
+					$('#photo').val('');
+
+				});
+
+				// Photo Edit Button
+				$('#employeeTable').on('click','.editBtn', function() {
+					var employeeId = $(this).data('id');
+					$.ajax({
+						url:'/EmployeeInfoController1/GetById',
+						type:'GET',
+						data:{id: employeeId},
+						success:function(data){
+							if(data){
+								console.log(data);
+								if(data.photoPath != null){
+									$('#photoPlaceholder').hide();
+									$('#photoPHText').hide();
+									$('#photoPreview').attr('src', `Image/${data.photoPath}`).show();
+								} else{
+									$('#photoPlaceholder').show();
+									$('#photoPHText').show();
+									$('#photoPreview').attr('src', '').hide();
+								}
+								$('#EmployeeID').val(data.employeeID);
+								$('#AutoID').val(data.autoID);
+								$('#Name').val(data.name);
+								$('#Designation').val(data.designation);
+								$('#Department').val(data.department);
+								$('#GrossSalary').val(data.grossSalary);
+								$('#JoiningDate').val(data.joiningDate.split('T')[0]);
+								$('#Address').val(data.address);
+								$('#Phone').val(data.phone);
+								$('#Email').val(data.email);
+							}
+						},
+						error: function(){
+							alert('Not Found')
+						}
+					});
+
+				});
+
+
+				
+			// function submitForm WithAjax() {
+				$('#employeeForm').on('submit', function(e) {
+					e.preventDefault();
+					checkDuplicate(function(duplicate){
+						if (duplicate) {
+							return; // Stop submission if duplicate check fails
+						}
+						submitForm();
+					});
+				});
+
+				function checkDuplicate(callback){
+					var employeeId = $('#EmployeeID').val();
+					var name = $('#Name').val();
+					var phone = $('#Phone').val();
+					if (employeeId && employeeId.trim() !== '') {
+						$.ajax({
+							url: '/EmployeeInfoController1/IsDuplicate',
+							type: 'GET',
+							data: { EmployeeID: employeeId , Name:name, Phone:phone},
+							success: function (response) {
+
+								console.log(" Response for checkDuplicate : "+response);
+								if (response) {
+									alert('Data Alrady Exists.');
+									callback(true);
+									return true;
+								}else {
+									// Proceed with form submission
+									callback(false);
+									// return false;
+								}
+							},
+							error: function () {
+								alert('Error checking for duplicate Employee ID');
+								callback(true);
+								//return false;
+							 }
+						});
+					}
+				}
+
+				//Save Submit
+
+						function submitForm() {
+			const formData = new FormData($('#employeeForm')[0]);
+
+			// Get selected development skills from multiselect
+			var selectedDevSkills = $('#DevSkills').val();
+			if (selectedDevSkills && selectedDevSkills.length > 0) {
+				$.each(selectedDevSkills, function (index, value) {
+					formData.append('selectedDevSkills', value);
+				});
+			}
+
+			$.ajax({
+				url: '/EmployeeInfoController1/Save',
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function (response) {
+					console.log('Success:', response);
+					//debugger;
+					if (response.success) {
+						alert('Saved Successfully!');
+						clear();
+						location.reload();
+					} else {
+						alert('Error: ' + response.message);
+						if (response.error) {
+							console.log('Validation errors:', response.errors);
+						}
+					}
+				},
+				error: function (xhr, status, error) { // moved this outside success block
+					console.error('Error:', error);
+					alert('Error saving employee: ' + xhr.responseText);
+					try {
+						var errorResponse = JSON.parse(xhr.responseText);
+						alert('Error saving employee: ' + (errorResponse.message || error));
+					} catch (e) {
+						alert('Error saving employee: ' + error);
+					}
+				}
+			});
+		}
+
+				//Delete Btn Functionality
+
+				$('#deleteBtn').click(function () {
+					var ids = [];
+					$('.selectsingle:checked').each(function () {
+						ids.push($(this).val());
+						console.log(ids);
+					});
+					if (ids.length == 0) {
+						var employeeId = $('#AutoID').val();
+						if (employeeId && employeeId.trim() !== '') {
+							if (confirm('Are you sure you want to delete this employee?')) {
+								$.ajax({
+									url: '/EmployeeInfoController1/Delete',
+									type: 'POST',
+									data: { id: employeeId },
+									success: function (response) {
+										if (response.success) {
+											$('#row_' + employeeId).remove();
+											alert('Employee Deleted successfully');
+											 location.reload();
+											$('#employeeForm')[0].reset();
+										} else {
+											alert('Error deleting employee');
+										}
+									},
+									error: function () {
+										alert('Error deleting employee');
+									}
+								});
+							}
+						} else {
+							alert('Please select an employee to delete');
+						}
+					} else {
+						if (confirm('Are you sure you want to delete this ' + ids.length + ' employees?')) {
+							$.ajax({
+								url: '/EmployeeInfoController1/BulkDelete',
+								type: 'POST',
+								contentType: 'application/json',
+								data: JSON.stringify(ids),
+								success: function (response) {
+									if (response.success) {
+										alert('Employees deleted successfully');
+										location.reload();
+									}
+								},
+								error: function () {
+									alert('Error detecting while deleting employees');
+								}
+							});
+						}
+					}
+				});
+				$('#selectAll').on ('click',function(){
+					var isChecked = $(this).prop('checked');
+					console.log(isChecked);
+					$('.selectsingle').prop('checked',isChecked);
+				});
+
+				//  $(document).ready(function () {
+				// 	$('#SearchEmp').on('keyup', function () {
+				// 		var searchValue = $(this).val();
+
+				// 		$.ajax({
+				// 			url: '/EmployeeInfoController1/Getall',
+				// 			type: 'GET',
+				// 			data: { search: searchValue },
+				// 			success: function (data) {
+				// 			   showTableData(data);
+				// 			},
+				// 			error: function () {
+				// 				alert('Error searching employees');
+				// 			}
+				// 		});
+				// 	});
+				// });
+
+				// function loadDesignationTable() {
+				// 	var searchitem = $('#SearchEmp').val();
+				// 	fetch(`/EmployeeInfoController1/Getall?search=${encodeURIComponent(searchitem)}`)
+				// 		.then(response => response.json())
+				// 		.then(data => {
+				// 			showTableData(data); Display filtered data
+				// 		});
+				// }
+				// 		function showTableData(data) {
+				// 			var tbody = $('#employeeTableBody');
+				// 			tbody.empty(); Clear existing rows
+				// 			if (data.length > 0) {
+				// 				data.forEach(emp => {
+				// 					var row = `<tr>
+				// 						<td class="text-center" width="10%"><input type="checkbox" class="selectsingle" name="selectedItems" value="${emp.autoID}"/></td>
+				// 						<td>${emp.employeeID}</td>
+				// 						<td>${emp.name}</td>
+				// 						<td>${emp.designation}</td>
+				// 						<td>${emp.department}</td>
+				// 						<td>${emp.grossSalary}</td>
+				// 						<td>${new Date(emp.joiningDate).toISOString().split('T')[0]}</td>
+				// 						<td>${emp.phone}</td>
+				// 							<td>
+				// 						${emp.photoPath
+				// 						? `<img src="image/${emp.photoPath}" width="40"
+				// 						onerror="this.onerror=null; this.src='';" />`
+				// 						: `<i class="bi bi-person-circle fs-4"></i>`}
+				// 						</td>
+				// 						<td><button type="button" class="editBtn btn btn-sm btn-outline-secondary w-10%" data-id="${emp.employeeID}">Edit</button></td>
+				// 					</tr>`;
+				// 					tbody.append(row);
+				// 				});
+				// 			} else {
+				// 				tbody.append('<tr><td colspan="10" class="text-center">No Data Found</td></tr>');
+				// 			}
+
+				// 		}
+
+
+			//Function Paginated Tables
+
+					$(document).ready(function () {
+		  const $table = $('#employeeTable');
+
+		  if ($.fn.DataTable.isDataTable($table)) {
+			$table.DataTable().clear().destroy();
+		  }
+
+		  const table = $table.DataTable({
+			processing: true,
+			serverSide: true,
+			ajax: {
+			  url: '/EmployeeInfoController1/GetPaginated',
+			  type: 'POST',
+			  dataSrc: 'data'
+			},
+			columns: [
+			  {
+				data: null,
+				orderable: false,
+				searchable: false,
+				className: 'text-center',
+				render: function (_, __, row) {
+				  return `<input type="checkbox" class="selectsingle" name="selectedItems" value="${row.autoID}" />`;
+				}
+			  },
+			  { data: 'employeeID' },
+			  { data: 'name' },
+			  { data: 'designation' },
+			  { data: 'department' },
+			  {
+				data: 'grossSalary',
+				render: function (d) {
+				  return d == null || d === 0 ? '' : d.toLocaleString();
+				}
+			  },
+			  {
+				data: 'joiningDate',
+				render: function (d) {
+				  if (!d) return '';
+				  const date = new Date(d);
+				  const day = String(date.getDate()).padStart(2, '0');
+				  const month = String(date.getMonth() + 1).padStart(2, '0');
+				  const year = date.getFullYear();
+				  return `${day}-${month}-${year}`;
+				}
+			  },
+			  { data: 'phone' },
+			  {
+				data: 'photoPath',
+				render: function (path) {
+				  return path
+					? `<img src="/Image/${path}" class="img-thumbnail" style="width:50px;height:50px;object-fit:cover;border-radius:5px;" />`
+					: `<span class="text-muted">👤</span>`;
+				}
+			  },
+			  {
+				data: null,
+				orderable: false,
+				searchable: false,
+				className: 'text-center',
+				render: function (_, __, row) {
+				  return `<button type="button" class="editBtn btn btn-sm btn-outline-secondary" data-id="${row.employeeID}">Edit</button>`;
+				}
+			  }
+			],
+			order: [[1, 'asc']],
+			autoWidth: false
+		  });
+
+		  // “Select All” checkbox handler
+		  $('#selectAll').on('click', function () {
+			const checked = $(this).is(':checked');
+			$('#employeeTable tbody input.selectsingle').prop('checked', checked);
+		  });
+
+		  // Sync header checkbox with individual rows
+		  $('#employeeTable tbody').on('change', 'input.selectsingle', function () {
+			const allBoxes = table.rows({ page: 'current' }).nodes().to$().find('input.selectsingle');
+			const checkedBoxes = allBoxes.filter(':checked').length;
+			$('#selectAll').prop('checked', allBoxes.length === checkedBoxes);
+		  });
+
+		  // Autofocus and Enter key navigation
+		  $('#Name').focus();
+
+		  $('input,select,textarea').on('keydown', function (e) {
+			if (e.key === 'Enter') {
+			  e.preventDefault();
+			  let fields = $('input,select,textarea').filter(':visible:not(:disabled)');
+			  let index = fields.index(this);
+			  if (index > -1 && index + 1 < fields.length) {
+				fields.eq(index + 1).focus();
+			  }
+			}
+		  });
+		});
+
+
+		//Development Skills Section
+
+				
+		// 		$(document).ready(function() {
+		// 	$('#DevelopmentSkills').multiselect({
+		// 		includeSelectAllOption: true,
+		// 		selectAllText: 'Select All Skills',
+		// 		nonSelectedText: 'Select Skills...',
+		// 		nSelectedText: ' skills selected',
+		// 		numberDisplayed: 2,
+		// 		enableFiltering: true,
+		// 		filterPlaceholder: 'Search skills...',
+		// 		maxHeight: 300,
+		// 		buttonClass: 'form-control text-start',
+		// 		buttonWidth: '100%'
+		// 	});
+		// });
+
+		//Utility functions
+		// function getSelectedSkills() {
+		// 	return $('#DevelopmentSkills').val() || [];
+		// }
+
+		// function setSelectedSkills(skillsArray) {
+		// 	$('#DevelopmentSkills').multiselect('select', skillsArray);
+		// }
+
+		// function clearAllSkills() {
+		// 	$('#DevelopmentSkills').multiselect('deselectAll', false);
+		// 	$('#DevelopmentSkills').multiselect('updateButtonText');
+		// }
+
+
+
+
+
+		// document.addEventListener('DOMContentLoaded', function () {
+		// 	const skillSelect = document.getElementById('DevelopmentSkills');
+
+		// 	skillSelect.addEventListener('change', function () {
+		// 		const selectedOptions = Array.from(skillSelect.selectedOptions).map(option => option.value);
+		// 		console.log('Selected Skills:', selectedOptions);
+		// 	});
+
+		// 	function setSelectedSkills(skillArray) {
+		// 		const skillSelect = document.getElementById('DevelopmentSkills');
+		// 		Array.from(skillSelect.options).forEach(option => {
+		// 			option.selected = skillArray.includes(option.value);
+		// 		});
+		// 	}
+
+		// 	function getSelectedSkills() {
+		// 		return Array.from(skillSelect.selectedOptions).map(option => option.value);
+		// 	}
+
+		// 	// Expose functions globally
+		// 	window.getSelectedSkills = getSelectedSkills;
+		// 	window.setSelectedSkills = setSelectedSkills;
+		// });
+
+
+
+
+
+
+
+		// Developmentskillss sections Comment
+
+
+
+
+
+		// let skillsDropdownOpen = false;
+
+		// function toggleSkillsDropdown() {
+		// 	const content = document.getElementById('skillsDropdownContent');
+		// 	skillsDropdownOpen = !skillsDropdownOpen;
+
+		// 	if (skillsDropdownOpen) {
+		// 		content.classList.add('show');
+		// 	} else {
+		// 		content.classList.remove('show');
+		// 	}
+		// }
+
+		// // Close dropdown if clicking outside
+		// document.addEventListener('click', function (event) {
+		// 	const content = document.getElementById('skillsDropdownContent');
+		// 	if (!content.contains(event.target) && !event.target.closest('#skillsDropdownButton')) {
+		// 		content.classList.remove('show');
+		// 		skillsDropdownOpen = false;
+		// 	}
+		// });
+
+		// document.addEventListener('DOMContentLoaded', function () {
+		// 	const checkboxes = document.querySelectorAll('#skillsDropdownContent input[type="checkbox"]');
+		// 	const toggleInput = document.getElementById('skillsDropdownToggle');
+		// 	const hiddenInput = document.getElementById('DevelopmentSkills');
+
+		// 	// Handle checkbox changes
+		// 	checkboxes.forEach(function (checkbox) {
+		// 		checkbox.addEventListener('change', function () {
+		// 			updateSelectedSkills();
+		// 		});
+		// 	});
+
+		// 	function updateSelectedSkills() {
+		// 		const selectedSkills = [];
+		// 		checkboxes.forEach(function (checkbox) {
+		// 			if (checkbox.checked) {
+		// 				selectedSkills.push(checkbox.value);
+		// 			}
+		// 		});
+		// 		const skillsString = selectedSkills.join(', ');
+		// 		toggleInput.value = skillsString; // Show selected skills in toggle input
+		// 		hiddenInput.value = skillsString; // Store in hidden input if needed
+		// 		return skillsString;
+		// 	}
+
+		// 	function getSelectedSkills() {
+		// 		return Array.from(checkboxes)
+		// 			.filter(checkbox => checkbox.checked)
+		// 			.map(checkbox => checkbox.value);
+		// 	}
+
+		// 	function setSelectedSkills(skillsArray) {
+		// 		checkboxes.forEach(function (checkbox) {
+		// 			checkbox.checked = skillsArray.includes(checkbox.value);
+		// 		});
+		// 		updateSelectedSkills();
+		// 	}
+
+		// 	// Expose functions globally
+		// 	window.getSelectedSkills = getSelectedSkills;
+		// 	window.setSelectedSkills = setSelectedSkills;
+		// 	window.updateSelectedSkills = updateSelectedSkills;
+		// });
+	
+	</script>
+	}

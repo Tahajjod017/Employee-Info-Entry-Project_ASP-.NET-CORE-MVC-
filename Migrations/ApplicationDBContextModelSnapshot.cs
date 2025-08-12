@@ -74,6 +74,32 @@ namespace EmployeeMvc.Migrations
                     b.ToTable("Designations");
                 });
 
+            modelBuilder.Entity("EmployeeMvc.Models.Devskill", b =>
+                {
+                    b.Property<string>("DevId")
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<int>("AutoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AutoId"));
+
+                    b.Property<string>("DevName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DevShortName")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("DevId");
+
+                    b.ToTable("Devskills");
+                });
+
             modelBuilder.Entity("EmployeeMvc.Models.Employeeinfo", b =>
                 {
                     b.Property<int>("AutoID")
@@ -92,6 +118,9 @@ namespace EmployeeMvc.Migrations
                     b.Property<string>("Designation")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DevSkills")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");

@@ -27,11 +27,28 @@ namespace EmployeeMvc.Controllers
             }
             return View(Designation);
         }
-        public async Task<JsonResult> Getall()
+        //public async Task<JsonResult> Getall()
+        //{
+        //    var data = await dbContext.Designations.OrderByDescending(x=>x.AutoId).ToListAsync();
+        //    return Json(data);
+        //}
+
+        public async Task<JsonResult> Getall(string? search)
         {
-            var data = await dbContext.Designations.OrderByDescending(x=>x.AutoId).ToListAsync();
+            var query = dbContext.Designations.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(x => x.DesignationName.Contains(search) ||
+                                         x.DesignationId.Contains(search) ||
+                                         x.DesingnationShortname.Contains(search)
+                );
+            }
+
+            var data = await query.OrderByDescending(x => x.AutoId).ToListAsync();
             return Json(data);
         }
+
         [HttpPost]
         public async Task<IActionResult> Save(Designation employee)
         {
@@ -133,6 +150,8 @@ namespace EmployeeMvc.Controllers
                 var isDuplicate = dbContext.Designations.Any(d => d.DesignationName.Trim().ToLower() == checkName /*&& d.DesignationId != designationId*/);
                  return (isDuplicate); 
         }
+
+
         
 
     }
