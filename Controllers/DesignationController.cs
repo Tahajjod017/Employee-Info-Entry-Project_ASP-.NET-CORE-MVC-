@@ -45,7 +45,7 @@ namespace EmployeeMvc.Controllers
                 );
             }
 
-            var data = await query.OrderByDescending(x => x.AutoId).ToListAsync();
+            var data = await query.OrderBy(x => x.AutoId).ToListAsync();
             return Json(data);
         }
 

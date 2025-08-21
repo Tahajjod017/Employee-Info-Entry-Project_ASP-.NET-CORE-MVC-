@@ -1,6 +1,8 @@
 ﻿using System.Buffers;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using System.Drawing.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Azure.Core;
 using EmployeeMvc.Models;
@@ -85,85 +87,132 @@ namespace EmployeeMvc.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> Save(Employeeinfo employee, string[] selectedDevSkills)
+public async Task<IActionResult> Save(Employeeinfo employee, string[] selectedDevSkills, List<Educationalinfo> EducationRecords)
+{
+    if (ModelState.IsValid)
+    {
+        bool isDuplicate = await IsDuplicate(employee.Name, employee.EmployeeID, employee.Phone);
+        if (isDuplicate)
         {
-            if (ModelState.IsValid)
+            TempData["ErrorMessage"] = "Data already exists with this name or phone number.";
+            return RedirectToAction("Index");
+        }
+
+        if (employee.AutoID == 0)
+        {
+            // New Employee
+            if (employee.photo != null)
             {
-                bool isDuplicate = await IsDuplicate(employee.Name, employee.EmployeeID, employee.Phone);
+                string? uniqueFileName = GetUploadFileName(employee);
+                employee.PhotoPath = uniqueFileName;
+            }
 
-                if (isDuplicate)
-                {
-                    TempData["ErrorMessage"] = "Data already exists with this name or phone number.";
-                    return RedirectToAction("Index");
-                }
+            var emp = new Employeeinfo();
+            emp.EmployeeID = employee.EmployeeID;
+            emp.Name = employee.Name;
+            emp.Phone = employee.Phone;
+            emp.Department = employee.Department ?? string.Empty;
+            emp.Designation = employee.Designation ?? string.Empty;
+            emp.Address = employee.Address ?? string.Empty;
+            emp.Email = employee.Email ?? string.Empty;
+            emp.PhotoPath = employee.PhotoPath ?? string.Empty;
+            emp.JoiningDate = employee.JoiningDate ?? DateTime.MinValue;
+            emp.GrossSalary = employee.GrossSalary ?? 0;
+            emp.DevSkills = string.Join(",", selectedDevSkills);
+            
+            dbContext.Employeeinfos.Add(emp);
+            await dbContext.SaveChangesAsync(); // Save to get AutoId
 
-                if (employee.AutoID == 0)
+            // Save Education Records
+            if (EducationRecords != null && EducationRecords.Count > 0)
+            {
+                foreach (var educationRecord in EducationRecords)
                 {
-                    if (employee.photo != null)
+                    if (!string.IsNullOrWhiteSpace(educationRecord.ExamTitle) && 
+                        !string.IsNullOrWhiteSpace(educationRecord.Institution))
                     {
-                        string? uniqueFileName = GetUploadFileName(employee);
-                        employee.PhotoPath = uniqueFileName;
-                    }
-
-                    var emp = new Employeeinfo();
-
-                    emp.EmployeeID = employee.EmployeeID;
-                    emp.Name = employee.Name;
-                    emp.Phone = employee.Phone;
-                    emp.Department = employee.Department ?? string.Empty;
-                    emp.Designation = employee.Designation ?? string.Empty;
-                    emp.Address = employee.Address ?? string.Empty;
-                    emp.Email = employee.Email ?? string.Empty;
-                    emp.PhotoPath = employee.PhotoPath ?? string.Empty;
-                    emp.JoiningDate = employee.JoiningDate ?? DateTime.MinValue;
-                    emp.GrossSalary = employee.GrossSalary ?? 0;
-                    emp.DevSkills = string.Join(",", selectedDevSkills);
-
-
-                    dbContext.Employeeinfos.Add(emp);
-                }
-
-                //dbContext.Employeeinfos.Add(employee);
-                else
-                {
-                    var emp = await dbContext.Employeeinfos.FindAsync(employee.AutoID);
-
-                    if (emp != null)
-                    {
-                        if (employee.photo != null)
+                        var eduInfo = new Educationalinfo
                         {
-                            if (!string.IsNullOrEmpty(emp.PhotoPath))
-                            {
-                                var photoPath = Path.Combine(webHost.WebRootPath, "Image", Path.GetFileName(emp.PhotoPath));
-                                {
-                                    try
-                                    {
-                                        System.IO.File.Delete(photoPath);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine($"Error deleting file: {ex.Message}");
-                                    }
-                                }
-                            }
-                            string? uniqueFileName = GetUploadFileName(employee);
-                            emp.PhotoPath = uniqueFileName;
-                        }
-                        emp.EmployeeID = employee.EmployeeID;
-                        emp.Name = employee.Name;
-                        emp.Phone = employee.Phone;
-                        emp.Department = employee.Department ?? string.Empty;
-                        emp.Designation = employee.Designation ?? string.Empty;
-                        emp.Address = employee.Address ?? string.Empty;
-                        emp.Email = employee.Email ?? string.Empty;
-                        emp.JoiningDate = employee.JoiningDate ?? DateTime.MinValue;
-                        emp.GrossSalary = string.IsNullOrWhiteSpace(employee.GrossSalary?.ToString()) ? null : employee.GrossSalary;
+                            AutoId = emp.AutoID, // Use the saved employee's AutoID
+                            EmployeeID = emp.AutoID, // Foreign key reference
+                            ExamTitle = educationRecord.ExamTitle,
+                            Institution = educationRecord.Institution,
+                            Result = educationRecord.Result,
+                            PassingYear = educationRecord.PassingYear
+                        };
+                        dbContext.Educationalinfos.Add(eduInfo);
                     }
                 }
                 await dbContext.SaveChangesAsync();
             }
-            return Json(new { success = true });
         }
+        else
+        {
+            // Update existing employee
+            var emp = await dbContext.Employeeinfos.FindAsync(employee.AutoID);
+            if (emp != null)
+            {
+                if (employee.photo != null)
+                {
+                    if (!string.IsNullOrEmpty(emp.PhotoPath))
+                    {
+                        var photoPath = Path.Combine(webHost.WebRootPath, "Image", Path.GetFileName(emp.PhotoPath));
+                        try
+                        {
+                            System.IO.File.Delete(photoPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error deleting file: {ex.Message}");
+                        }
+                    }
+                    string? uniqueFileName = GetUploadFileName(employee);
+                    emp.PhotoPath = uniqueFileName;
+                }
+
+                emp.EmployeeID = employee.EmployeeID;
+                emp.Name = employee.Name;
+                emp.Phone = employee.Phone;
+                emp.Department = employee.Department ?? string.Empty;
+                emp.Designation = employee.Designation ?? string.Empty;
+                emp.Address = employee.Address ?? string.Empty;
+                emp.Email = employee.Email ?? string.Empty;
+                emp.JoiningDate = employee.JoiningDate ?? DateTime.MinValue;
+                emp.GrossSalary = string.IsNullOrWhiteSpace(employee.GrossSalary?.ToString()) ? null : employee.GrossSalary;
+                emp.DevSkills = string.Join(",", selectedDevSkills);
+
+                // Update Education Records
+                // First, remove existing education records
+                var existingEducationRecords = dbContext.Educationalinfos.Where(e => e.AutoId == emp.AutoID);
+                dbContext.Educationalinfos.RemoveRange(existingEducationRecords);
+
+                // Add updated education records
+                if (EducationRecords != null && EducationRecords.Count > 0)
+                {
+                    foreach (var educationRecord in EducationRecords)
+                    {
+                        if (!string.IsNullOrWhiteSpace(educationRecord.ExamTitle) && 
+                            !string.IsNullOrWhiteSpace(educationRecord.Institution))
+                        {
+                            var eduInfo = new Educationalinfo
+                            {
+                                AutoId = emp.AutoID,
+                                EmployeeID = emp.AutoID, // Foreign key reference
+                                ExamTitle = educationRecord.ExamTitle,
+                                Institution = educationRecord.Institution,
+                                Result = educationRecord.Result,
+                                PassingYear = educationRecord.PassingYear
+                            };
+                            dbContext.Educationalinfos.Add(eduInfo);
+                        }
+                    }
+                }
+                await dbContext.SaveChangesAsync();
+            }
+        }
+    }
+    return Json(new { success = true, message = "Employee saved successfully" });
+}
 
         private string? GetUploadFileName(Employeeinfo emp)
         {
@@ -267,7 +316,7 @@ namespace EmployeeMvc.Controllers
             int nextId = maxId + 1;
             return nextId.ToString("D3");
         }
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(string id) //Edit btn controller
         {
             var employee = await dbContext.Employeeinfos
                 .FirstOrDefaultAsync(e => e.EmployeeID == id);
@@ -371,6 +420,7 @@ namespace EmployeeMvc.Controllers
                             emp.PhotoPath,
                             emp.GrossSalary,
                             emp.JoiningDate,
+                            emp.DevSkills,
                             Designation = des.DesignationName,
                             Department = dep.DepartmentName
                         };
@@ -394,16 +444,67 @@ namespace EmployeeMvc.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Return in DataTables format
+            //Pocess DevSkills to get readable names
+            var processedData = data.Select(item => new
+            {
+                item.AutoID,
+                item.EmployeeID,
+                item.Name,
+                item.Email,
+                item.Phone,
+                item.PhotoPath,
+                item.GrossSalary,
+                item.JoiningDate,
+                item.Designation,
+                item.Department,
+                DevSkills = GetDevSkillsNames(item.DevSkills)
+
+            }).ToList();
+
+            //Return in DataTables format
+
             return Json(new
             {
                 draw = draw,
                 recordsTotal = totalRecords,
                 recordsFiltered = totalRecords,
-                data = data
+                data = processedData
             });
         }
+
+        // Helper method to convert DevSkills IDs to readable names
+        private string GetDevSkillsNames(string devSkillIds)
+        {
+            if (string.IsNullOrEmpty(devSkillIds))
+                return "";
+
+            try
+            {
+                // Split comma-separated IDs and convert to integers
+                var skillIds = devSkillIds.Split(',')
+                    .Where(id => !string.IsNullOrWhiteSpace(id))
+                    //.Select(id => int.Parse(id.Trim()))
+                    .ToList();
+
+                if (!skillIds.Any())
+                    return "";
+
+                // Get skill names from Devskills table based on your table structure
+                var skillNames = dbContext.Devskills
+                    .Where(d => skillIds.Contains(d.DevId))
+                    .Select(d => d.DevName) // Use DevName for full names or DevShortName for short names
+                    .ToList();
+
+                return string.Join(", ", skillNames);
+            }
+            catch (Exception)
+            {
+                return ""; // Return empty string if parsing fails
+            }
+        }
+
     }
+    
 }
 
     

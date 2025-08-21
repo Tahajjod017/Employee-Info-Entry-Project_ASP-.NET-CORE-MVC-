@@ -33,7 +33,7 @@ namespace EmployeeMvc.Controllers
         }
         public async Task<IActionResult> Getall()
         {
-            var data = await dBContext.Departments.OrderByDescending(x=>x.AutoId).ToListAsync();
+            var data = await dBContext.Departments.OrderBy(x=>x.AutoId).ToListAsync();
             return Json(data);
         }
         [HttpPost]

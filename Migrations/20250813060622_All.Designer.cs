@@ -4,6 +4,7 @@ using EmployeeMvc.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EmployeeMvc.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250813060622_All")]
+    partial class All
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -317,45 +320,6 @@ namespace EmployeeMvc.Migrations
                         });
                 });
 
-            modelBuilder.Entity("EmployeeMvc.Models.Educationalinfo", b =>
-                {
-                    b.Property<int>("EducationalinfoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EducationalinfoId"));
-
-                    b.Property<int>("AutoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeinfoAutoID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ExamTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Institution")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("PassingYear")
-                        .HasMaxLength(50)
-                        .HasColumnType("int");
-
-                    b.Property<string>("Result")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("EducationalinfoId");
-
-                    b.HasIndex("EmployeeinfoAutoID");
-
-                    b.ToTable("Educationalinfos");
-                });
-
             modelBuilder.Entity("EmployeeMvc.Models.Employeeinfo", b =>
                 {
                     b.Property<int>("AutoID")
@@ -407,18 +371,6 @@ namespace EmployeeMvc.Migrations
                     b.HasKey("AutoID");
 
                     b.ToTable("Employeeinfos");
-                });
-
-            modelBuilder.Entity("EmployeeMvc.Models.Educationalinfo", b =>
-                {
-                    b.HasOne("EmployeeMvc.Models.Employeeinfo", null)
-                        .WithMany("Educationalinfos")
-                        .HasForeignKey("EmployeeinfoAutoID");
-                });
-
-            modelBuilder.Entity("EmployeeMvc.Models.Employeeinfo", b =>
-                {
-                    b.Navigation("Educationalinfos");
                 });
 #pragma warning restore 612, 618
         }

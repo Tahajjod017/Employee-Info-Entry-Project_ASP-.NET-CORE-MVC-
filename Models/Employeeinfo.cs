@@ -24,7 +24,8 @@ namespace EmployeeMvc.Models
         public string? PhotoPath {  get; set; } = string.Empty;
         [NotMapped]
         public IFormFile? photo { get; set; }
-
+        //Navigation for Fogen key
+        public virtual ICollection<Educationalinfo> Educationalinfos { get; set; }
 
 
     }
