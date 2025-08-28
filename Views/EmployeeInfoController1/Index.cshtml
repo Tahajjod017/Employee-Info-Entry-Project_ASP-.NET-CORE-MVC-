@@ -8,19 +8,21 @@
 }
 <style>
 
-	table{
-		border-collapse:collapse;
-		width:100%;
-		font-family:Arial,sans-serif;
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		font-family: Arial,sans-serif;
 	}
-	th{
-		border:1px solid #dee2e6;
-		padding:8px;
-		font-weight:bold;
-		background-color:#f8f9fa;
+
+	th {
+		border: 1px solid #dee2e6;
+		padding: 8px;
+		font-weight: bold;
+		background-color: #f8f9fa;
 	}
-	input[type="checkbox"]{
-		cursor:pointer;
+
+	input[type="checkbox"] {
+		cursor: pointer;
 	}
 
 	.pagination-section {
@@ -28,25 +30,25 @@
 		justify-content: space-between;
 		align-items: center;
 		margin-top: 15px;
-
-
 	}
 
 	#employeeTable td:nth-child(8),
 	#employeeTable td:nth-child(7),
 	#employeeTable td:nth-child(2),
-	#employeeTable td:nth-child(9){
-		text-align:center;
-		vertical-align:middle;
+	#employeeTable td:nth-child(9) {
+		text-align: center;
+		vertical-align: middle;
 	}
-	#employeeTable td:nth-child(6){
-		text-align:right;
+
+	#employeeTable td:nth-child(6) {
+		text-align: right;
 		font-weight: bold;
 	}
+
 	#employeeTable td:nth-child(3),
 	#employeeTable td:nth-child(4),
-	#employeeTable td:nth-child(5){
-		text-align:left
+	#employeeTable td:nth-child(5) {
+		text-align: left
 	}
 
 	#employeeTable th:nth-child(6),
@@ -177,7 +179,8 @@
 				</div>
 				<div class="card-body">
 
-					<form id="employeeForm" @* asp-action="Save" method="post" *@>
+					<form id="employeeForm" enctype="multipart/form-data">
+						@* asp-action="Save" method="post" *@>
 						<div class="row mt-2">
 							<div class="col-9 mb-4 text-end">
 								<button type="submit" id="saveBtn" class="btn btn-lg btn-success me-2">Save</button>
@@ -355,9 +358,9 @@
 							</div>
 							<!--Education Info Section-->
 							<div class="row mb-4">
-								<div class = "col-12">
+								<div class="col-12">
 									<div class="card-header bg-light">
-										<h6 class ="mb-0">Education Info:</h6>
+										<h6 class="mb-0">Education Info:</h6>
 									</div>
 								</div>
 								<div class="card-body p-3">
@@ -405,7 +408,7 @@
 													<td><input type="text" class="form-control form-control-sm" placeholder="Enter institution" /></td>
 													<td><input type="text" class="form-control form-control-sm" placeholder="Result" /></td>
 													<td><input type="number" class="form-control form-control-sm" placeholder="Year" min="2000" max="2030" /></td>
-													
+
 													<td>
 														<button type="button" class="btn btn-success btn-sm" id="addEduinfoBtn" onclick="addEducationinfoRow()" style="padding:2px 6px; font-size:12px;">+</button>
 														<button type="button" class="btn btn-danger btn-sm" id="removeEduinfoBtn" onclick="removeEducationinfoRow()" style="padding:2px 6px; font-size:12px;">-</button>
@@ -417,7 +420,7 @@
 								</div>
 							</div>
 						</div>
-				</form>
+					</form>
 					<!--Employee Data Grid View-->
 					<div class="table-responsive"></div>
 					<div class=" table section">
@@ -428,7 +431,7 @@
 							</div>
 							<div class="col-md-6">
 								<div class="d-flex justify-content-end">
-								@* 	<input type="text" class="form-control" placeholder="Search" id="SearchEmp" style="width:200px" /> *@
+									@* 	<input type="text" class="form-control" placeholder="Search" id="SearchEmp" style="width:200px" /> *@
 								</div>
 							</div>
 						</div>
@@ -531,14 +534,15 @@
 									</li>
 								</ul>
 							</nav>
-						 *@</div>
+						 *@
 					</div>
-					<div>
-					</div>
+				</div>
+				<div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 </div>
 <!--Designation Modal-->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -594,466 +598,398 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/js/bootstrap-multiselect.min.js"></script>
 	<script>
 
-				$(document).ready(function () {
-					// Initial Data Loads
-					DevDD();
-					DesignationDD();
-					DepartmentDD();
-					GetEmployeeNextID();
-					Name.focus();
-					
-					
-					// Modal Load Events
-					$('#loadDesignationModal').on('click', function () {
-						$('#desigModalBody').load('/Designation/Index?isPartial=true', function () {
-							DesignationDD(); // Optional: reload if modal content includes dropdown
+					$(document).ready(function () {
+						// Initial Data Loads
+						DevDD();
+						DesignationDD();
+						DepartmentDD();
+						GetEmployeeNextID();
+						Name.focus();
+
+
+						// Modal Load Events
+						$('#loadDesignationModal').on('click', function () {
+							$('#desigModalBody').load('/Designation/Index?isPartial=true', function () {
+								DesignationDD(); // Optional: reload if modal content includes dropdown
+							});
+						});
+						$('#loadDepartmentModal').on('click', function () {
+							$('#DepartmentModalBody').load('/Department/Index?isPartial=true', function () {
+								DepartmentDD(); // Optional: reload if modal content includes dropdown
+							});
 						});
 					});
-					$('#loadDepartmentModal').on('click', function () {
-						$('#DepartmentModalBody').load('/Department/Index?isPartial=true', function () {
-							DepartmentDD(); // Optional: reload if modal content includes dropdown
-						});
-					});
-				});
 
-				// 🔄 Load Designations
-				function DesignationDD() {
-					$.get('/Designation/GetAll', function (designations) {
-						var $dropdown = $('#Designation');
-						$dropdown.empty();
+					// 🔄 Load Designations
+					function DesignationDD() {
+						$.get('/Designation/GetAll', function (designations) {
+							var $dropdown = $('#Designation');
+							$dropdown.empty();
 
-						$dropdown.append($('<option>', {
-							value: '',
-							text: 'Select Designation...',
-							disabled: true,
-							selected: true
-						}));
-
-						$.each(designations, function (i, item) {
 							$dropdown.append($('<option>', {
-								value: item.designationId,
-								text: item.designationName
+								value: '',
+								text: 'Select Designation...',
+								disabled: true,
+								selected: true
 							}));
+
+							$.each(designations, function (i, item) {
+								$dropdown.append($('<option>', {
+									value: item.designationId,
+									text: item.designationName
+								}));
+							});
+
 						});
-
-					});
-				}
-				//Development Skills 
-						function DevDD() {
-									$.get('/EmployeeInfoController1/GetallDev', function (designations) {
-								var $dropdown = $('#DevSkills');
-
-						if ($dropdown.data('multiselect')) {
-							$dropdown.multiselect('destroy');
-						}
-
-						$dropdown.empty();
-
-						$.each(designations, function (i, item) {
-							$dropdown.append($('<option>', {
-										value: item.devId,
-										text: item.devName
-							}));
-						});
-
-					$dropdown.multiselect({
-					includeSelectAllOption: true,
-					selectAllText: 'Select All',
-					nonSelectedText: 'Select DevSkills',
-					nSelectedText: ' selected',
-					allSelectedText: 'All selected',
-					numberDisplayed: 2,
-					enableFiltering: true,
-					filterPlaceholder: 'Search devskills',
-					maxHeight: 300,
-					buttonWidth: '100%',
-					buttonClass: 'form-control text-start',
-					templates: {
-						button: '<button type="button"  class="multiselect dropdown-toggle" data-bs-toggle="dropdown"><span class="multiselect-selected-text"></span></button>',
-						ul: '<ul class="multiselect-container dropdown-menu"></ul>',
-						filter: '<li class="multiselect-item multiselect-filter"><div class="input-group"><input class="form-control multiselect-search" type="text" placeholder="Search..."></div></li>',
-						filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="fa fa-times"></i></button></span>',
-						li: '<li><a tabindex="0"><label></label></a></li>',
-						divider: '<li class="multiselect-item divider"></li>',
-						liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
 					}
-				});
+					//Development Skills
+							function DevDD() {
+										$.get('/EmployeeInfoController1/GetallDev', function (designations) {
+									var $dropdown = $('#DevSkills');
+
+							if ($dropdown.data('multiselect')) {
+								$dropdown.multiselect('destroy');
+							}
+
+							$dropdown.empty();
+
+							$.each(designations, function (i, item) {
+								$dropdown.append($('<option>', {
+											value: item.devId,
+											text: item.devName
+								}));
+							});
+
+						$dropdown.multiselect({
+						includeSelectAllOption: true,
+						selectAllText: 'Select All',
+						nonSelectedText: 'Select DevSkills',
+						nSelectedText: ' selected',
+						allSelectedText: 'All selected',
+						numberDisplayed: 2,
+						enableFiltering: true,
+						filterPlaceholder: 'Search devskills',
+						maxHeight: 300,
+						buttonWidth: '100%',
+						buttonClass: 'form-control text-start',
+						templates: {
+							button: '<button type="button"  class="multiselect dropdown-toggle" data-bs-toggle="dropdown"><span class="multiselect-selected-text"></span></button>',
+							ul: '<ul class="multiselect-container dropdown-menu"></ul>',
+							filter: '<li class="multiselect-item multiselect-filter"><div class="input-group"><input class="form-control multiselect-search" type="text" placeholder="Search..."></div></li>',
+							filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="fa fa-times"></i></button></span>',
+							li: '<li><a tabindex="0"><label></label></a></li>',
+							divider: '<li class="multiselect-item divider"></li>',
+							liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
+						}
 					});
-				}
-
-				// 🔄 Load Departments
-				function DepartmentDD() {
-					$.get('/Department/GetAll', function (departments) {
-						var $dropdown = $('#Department');
-						$dropdown.empty();
-
-						$dropdown.append($('<option>', {
-							value: '',
-							text: 'Select Department...',
-							disabled: true,
-							selected: true
-						}));
-
-						$.each(departments, function (i, item) {
-							$dropdown.append($('<option>', {
-								value: item.departmentId,
-								text: item.departmentName
-							}));
 						});
-					});
-				}
-
-				// 📄 Auto-generate Next Employee ID
-				function GetEmployeeNextID() {
-					$.ajax({
-						url: 'EmployeeInfoController1/GetEmployeeNextID',
-						type: 'GET',
-						success: function (data) {
-							console.log("Next Employee ID:", data);
-							$('#EmployeeID').val(data);
-						},
-						error: function () {
-							alert('Failed to get Employee Next ID');
-						}
-					});
-				}
-				$('#photo').on('change', function (event) {
-					const file = event.target.files[0];
-					if (file) {
-						const reader = new FileReader();
-						reader.onload = function (e) {
-							$('#photoPreview').attr('src', e.target.result).show();
-							$('#photoPlaceholder').hide();
-							$('#photoPHText').hide();
-
-						};
-						reader.readAsDataURL(file);
 					}
-				});
 
+					// 🔄 Load Departments
+					function DepartmentDD() {
+						$.get('/Department/GetAll', function (departments) {
+							var $dropdown = $('#Department');
+							$dropdown.empty();
 
-				 $('#clearBtn').on('click',function(){
-					 clear();
-				 });
-				function clear(){
-					$('#employeeForm')[0].reset();
-					$('#AutoID').val('0');
-					GetEmployeeNextID();
-					$('#photoPlaceholder').show();
-					$('#photoPHText').show();
-					$('#photoPreview').attr('src', '').hide();
+							$dropdown.append($('<option>', {
+								value: '',
+								text: 'Select Department...',
+								disabled: true,
+								selected: true
+							}));
 
-				}
-				$('#pic_clearBtn') .on('click',function(){
-					 $('#photoPlaceholder').show();
-					 $('#photoPHText').show();
-					$('#photoPreview').attr('src', '').hide();
-					$('#photo').val('');
+							$.each(departments, function (i, item) {
+								$dropdown.append($('<option>', {
+									value: item.departmentId,
+									text: item.departmentName
+								}));
+							});
+						});
+					}
 
-				});
-
-		// 		// New Function: LoadSkillsAndSelected
-		// function loadDevSkillsAndSelect(selectedSkills) {
-		// 	$.get('/EmployeeInfoController1/GetallDev', function (designations) {
-		// 		var $dropdown = $('#DevSkills');
-
-		// 		// Destroy existing multiselect
-		// 		if ($dropdown.data('multiselect')) {
-		// 			$dropdown.multiselect('destroy');
-		// 		}
-
-		// 		// Clear and reload options
-		// 		$dropdown.empty();
-		// 		$.each(designations, function (i, item) {
-		// 			$dropdown.append($('<option>', {
-		// 				value: item.devId,
-		// 				text: item.devName
-		// 			}));
-		// 		});
-
-		// 		// Preselect skills if provided
-		// 		if (selectedSkills && selectedSkills !== '') {
-		// 			var skillsArray = selectedSkills.split(',');
-		// 			$dropdown.val(skillsArray);
-		// 		} else {
-		// 			$dropdown.val([]);
-		// 		}
-
-		// 		// Reinitialize multiselect
-		// 		$dropdown.multiselect('refresh');
-		// 	});
-		// }
-
-
-			// function submitForm WithAjax() {
-				$('#employeeForm').on('submit', function(e) {
-					e.preventDefault();
-					checkDuplicate(function(duplicate){
-						if (duplicate) {
-							return; // Stop submission if duplicate check fails
-						}
-						submitForm();
-					});
-				});
-
-				function checkDuplicate(callback){
-					var employeeId = $('#EmployeeID').val();
-					var name = $('#Name').val();
-					var phone = $('#Phone').val();
-					if (employeeId && employeeId.trim() !== '') {
+					// 📄 Auto-generate Next Employee ID
+					function GetEmployeeNextID() {
 						$.ajax({
-							url: '/EmployeeInfoController1/IsDuplicate',
+							url: 'EmployeeInfoController1/GetEmployeeNextID',
 							type: 'GET',
-							data: { EmployeeID: employeeId , Name:name, Phone:phone},
-							success: function (response) {
-
-								console.log(" Response for checkDuplicate : "+response);
-								if (response) {
-									alert('Data Alrady Exists.');
-									callback(true);
-									return true;
-								}else {
-									// Proceed with form submission
-									callback(false);
-									// return false;
-								}
+							success: function (data) {
+								console.log("Next Employee ID:", data);
+								$('#EmployeeID').val(data);
 							},
 							error: function () {
-								alert('Error checking for duplicate Employee ID');
-								callback(true);
-								//return false;
-							 }
+								alert('Failed to get Employee Next ID');
+							}
 						});
 					}
-				}
+					$('#photo').on('change', function (event) {
+						const file = event.target.files[0];
+						if (file) {
+							const reader = new FileReader();
+							reader.onload = function (e) {
+								$('#photoPreview').attr('src', e.target.result).show();
+								$('#photoPlaceholder').hide();
+								$('#photoPHText').hide();
 
-				//Save Submit Function
-
-						function submitForm() {
-			const formData = new FormData($('#employeeForm')[0]);
-
-			// Get selected development skills from multiselect
-			var selectedDevSkills = $('#DevSkills').val();
-			if (selectedDevSkills && selectedDevSkills.length > 0) {
-				$.each(selectedDevSkills, function (index, value) {
-					formData.append('selectedDevSkills', value);
-				});
-			}
-
-			$.ajax({
-				url: '/EmployeeInfoController1/Save',
-				type: 'POST',
-				data: formData,
-				processData: false,
-				contentType: false,
-				success: function (response) {
-					console.log('Success:', response);
-					//debugger;
-					if (response.success) {
-						alert('Saved Successfully!');
-						clear();
-						location.reload();//Page refresh
-					} else {
-						alert('Error: ' + response.message);
-						if (response.error) {
-							console.log('Validation errors:', response.errors);
+							};
+							reader.readAsDataURL(file);
 						}
-					}
-				},
-				error: function (xhr, status, error) { // moved this outside success block
-					console.error('Error:', error);
-					alert('Error saving employee: ' + xhr.responseText);
-					try {
-						var errorResponse = JSON.parse(xhr.responseText);
-						alert('Error saving employee: ' + (errorResponse.message || error));
-					} catch (e) {
-						alert('Error saving employee: ' + error);
-					}
-				}
-			});
-		}
-
-
-				//Delete Btn Functionality
-
-				$('#deleteBtn').click(function () {
-					var ids = [];
-					$('.selectsingle:checked').each(function () {
-						ids.push($(this).val());
-						console.log(ids);
 					});
-					if (ids.length == 0) {
-						var employeeId = $('#AutoID').val();
-						if (employeeId && employeeId.trim() !== '') {
-							if (confirm('Are you sure you want to delete this employee?')) {
-								$.ajax({
-									url: '/EmployeeInfoController1/Delete',
-									type: 'POST',
-									data: { id: employeeId },
-									success: function (response) {
-										if (response.success) {
-											$('#row_' + employeeId).remove();
-											alert('Employee Deleted successfully');
-											 location.reload();
-											$('#employeeForm')[0].reset();
-										} else {
-											alert('Error deleting employee');
-										}
-									},
-									error: function () {
-										alert('Error deleting employee');
-									}
-								});
+
+
+					 $('#clearBtn').on('click',function(){
+						 clear();
+					 });
+					function clear(){
+						$('#employeeForm')[0].reset();
+						$('#AutoID').val('0');
+						GetEmployeeNextID();
+						$('#photoPlaceholder').show();
+						$('#photoPHText').show();
+						$('#photoPreview').attr('src', '').hide();
+
+					}
+					$('#pic_clearBtn') .on('click',function(){
+						 $('#photoPlaceholder').show();
+						 $('#photoPHText').show();
+						$('#photoPreview').attr('src', '').hide();
+						$('#photo').val('');
+
+					});
+
+			// 		// New Function: LoadSkillsAndSelected
+			// function loadDevSkillsAndSelect(selectedSkills) {
+			// 	$.get('/EmployeeInfoController1/GetallDev', function (designations) {
+			// 		var $dropdown = $('#DevSkills');
+
+			// 		// Destroy existing multiselect
+			// 		if ($dropdown.data('multiselect')) {
+			// 			$dropdown.multiselect('destroy');
+			// 		}
+
+			// 		// Clear and reload options
+			// 		$dropdown.empty();
+			// 		$.each(designations, function (i, item) {
+			// 			$dropdown.append($('<option>', {
+			// 				value: item.devId,
+			// 				text: item.devName
+			// 			}));
+			// 		});
+
+			// 		// Preselect skills if provided
+			// 		if (selectedSkills && selectedSkills !== '') {
+			// 			var skillsArray = selectedSkills.split(',');
+			// 			$dropdown.val(skillsArray);
+			// 		} else {
+			// 			$dropdown.val([]);
+			// 		}
+
+			// 		// Reinitialize multiselect
+			// 		$dropdown.multiselect('refresh');
+			// 	});
+			// }
+
+
+				// function submitForm WithAjax() {
+					$('#employeeForm').on('submit', function(e) {
+						e.preventDefault();
+						checkDuplicate(function(duplicate){
+							if (duplicate) {
+								return; // Stop submission if duplicate check fails
 							}
-						} else {
-							alert('Please select an employee to delete');
-						}
-					} else {
-						if (confirm('Are you sure you want to delete this ' + ids.length + ' employees?')) {
+							submitForm();
+						});
+					});
+
+					function checkDuplicate(callback){
+						var employeeId = $('#EmployeeID').val();
+						var name = $('#Name').val();
+						var phone = $('#Phone').val();
+						if (employeeId && employeeId.trim() !== '') {
 							$.ajax({
-								url: '/EmployeeInfoController1/BulkDelete',
-								type: 'POST',
-								contentType: 'application/json',
-								data: JSON.stringify(ids),
+								url: '/EmployeeInfoController1/IsDuplicate',
+								type: 'GET',
+								data: { EmployeeID: employeeId , Name:name, Phone:phone},
 								success: function (response) {
-									if (response.success) {
-										alert('Employees deleted successfully');
-										location.reload();
+
+									console.log(" Response for checkDuplicate : "+response);
+									if (response) {
+										alert('Data Alrady Exists.');
+										callback(true);
+										return true;
+									}else {
+										// Proceed with form submission
+										callback(false);
+										// return false;
 									}
 								},
 								error: function () {
-									alert('Error detecting while deleting employees');
-								}
+									alert('Error checking for duplicate Employee ID');
+									callback(true);
+									//return false;
+								 }
 							});
 						}
 					}
-				});
 
-				$('#selectAll').on ('click',function(){
-					var isChecked = $(this).prop('checked');
-					console.log(isChecked);
-					$('.selectsingle').prop('checked',isChecked);
-				});
 
-	//Function Paginated Tables
 
-							$(document).ready(function () {
-		const $table = $('#employeeTable');
-		if ($.fn.DataTable.isDataTable($table)) {
-				$table.DataTable().clear().destroy();
-		}
-		const table = $table.DataTable({
-				processing: true,
-				serverSide: true,
-				ajax: {
-				  url: '/EmployeeInfoController1/GetPaginated',
-				  type: 'POST',
-				  dataSrc: 'data',
-				},
-				columns: [
-				  {
-					data: null,
-					orderable: false,
-					searchable: false,
-					className: 'text-center align-middle',
-					render: function (_, __, row) {
-					  return `<input type="checkbox" class="selectsingle" name="selectedItems" value="${row.autoID}" />`;
-					}
-				  },
-				  { data: 'employeeID',className:'text-center align-middle' },
-				  { data: 'name',className:'text-center align-middle text-nowarp'},
-						  { data: 'designation', className: 'text-center align-middle' },
-					{ data: 'department', className: 'text-center align-middle' },
-						{
-				data: 'devSkills',
-				className: 'text-center',
-				render: function (data) {
-					return data && data !== '' ? data : '<span class="text-muted"></span>';
+					//Save Submit Function
+
+									function submitForm() {
+				const formData = new FormData($('#employeeForm')[0]);
+
+				// Get selected development skills from multiselect
+				var selectedDevSkills = $('#DevSkills').val();
+				if (selectedDevSkills && selectedDevSkills.length > 0) {
+					$.each(selectedDevSkills, function (index, value) {
+						formData.append('selectedDevSkills', value);
+					});
 				}
+
+				// Add all education record hidden inputs to FormData
+				// (This works if your education table hidden inputs are inside the #employeeForm)
+
+				$('#EducationinfoTableBody input[type="hidden"]').each(function() {
+
+					if ($(this).attr('name') && $(this).val()) {
+						formData.append($(this).attr('name'), $(this).val());
+					}
+				});
+				$.ajax({
+					url: '/EmployeeInfoController1/Save',
+					type: 'POST',
+					data: formData,
+					processData: false,
+					contentType: false,
+					success: function (response) {
+						console.log('Success:', response);
+						if (response.success) {
+							alert('Saved Successfully!');
+							clear();
+							location.reload(); // Page refresh
+						} else {
+							alert('Error: ' + response.message);
+							if (response.error) {
+								console.log('Validation errors:', response.errors);
+							}
+						}
 					},
+					error: function (xhr, status, error) {
+						console.error('Error:', error);
+						alert('Error saving employee: ' + xhr.responseText);
+						console.log(xhr.responseText);
+						try {
+							var errorResponse = JSON.parse(xhr.responseText);
+							alert('Error saving employee: ' + (errorResponse.message || error));
+						} catch (e) {
+							alert('Error saving employee: ' + error);
+						}
+					}
+				});
+			 }
 
-				  {
-					data: 'grossSalary',
-					className: 'text-end fornt-weight-bold',
-					render: function (d) {
-					  return d == null || d === 0 ? '' : `<strong>${d.toLocaleString()}</strong>`;
+						// Edit Button click handler
+		$('#employeeTable').on('click', '.editBtn', function () {
+			var employeeId = $(this).data('id');
+			$.ajax({
+				url: '/EmployeeInfoController1/GetById',
+				type: 'GET',
+				data: { id: employeeId },
+				success: function (data) {
+					if (data) {
+						console.log(data);
+						if (data.photoPath != null) {
+							$('#photoPlaceholder').hide();
+							$('#photoPHText').hide();
+							$('#photoPreview').attr('src', `Image/${data.photoPath}`).show();
+						} else {
+							$('#photoPlaceholder').show();
+							$('#photoPHText').show();
+							$('#photoPreview').attr('src', '').hide();
+						}
+						$('#EmployeeID').val(data.employeeID);
+						$('#AutoID').val(data.autoID);
+						$('#Name').val(data.name);
+						$('#Designation').val(data.designation);
+						$('#Department').val(data.department);
+						$('#GrossSalary').val(data.grossSalary);
+						$('#JoiningDate').val(data.joiningDate.split('T')[0]);
+						$('#Address').val(data.address);
+						$('#Phone').val(data.phone);
+						$('#Email').val(data.email);
 					}
-				  },
-				  {
-					data: 'joiningDate',
-					render: function (d) {
-					  if (!d) return '';
-					  const date = new Date(d);
-					  // Check for DateTime.MinValue (year 0001 shows as "01-01-1")
-					  if (date.getFullYear() === 1) {
-						return '';
-					  }
-					  const day = String(date.getDate()).padStart(2, '0');
-					  const month = String(date.getMonth() + 1).padStart(2, '0');
-					  const year = date.getFullYear();
-					  return `${day}/${month}/${year}`;
+					// Clear existing educational records
+					clearAllEducationData();
+					if (data.educationalRecords && data.educationalRecords.length > 0) {
+						populateEducationalRecords(data.educationalRecords);
 					}
-				  },
-				  { data: 'phone' },
-				  {
-					data: 'photoPath',
-					className:'text-center  align-middle',
-					render: function (path) {
-					  return path
-						? `<img src="/Image/${path}" class="img-thumbnail" style="width:50px;height:50px;object-fit:cover;border-radius:5px;" />`
-						: `<span class="text-muted">👤</span>`;
-					}
-				  },
-				  {
-					data: null,
-					orderable: false,
-					searchable: false,
-					className: 'text-center',
-					render: function (_, __, row) {
-					  return `<button type="button" class="editBtn btn btn-sm btn-outline-secondary" data-id="${row.employeeID}">Edit</button>`;
-					}
-				  }
-				],
-				order: [[1, 'asc']],
-				autoWidth: false
+				},
+				error: function () {
+					alert('Not Found');
+				}
+			});
 		});
 
-		  // “Select All” checkbox handler
-		  $('#selectAll').on('click', function () {
-			const checked = $(this).is(':checked');
-			$('#employeeTable tbody input.selectsingle').prop('checked', checked);
-		  });
+				// Function to populate educational records in the table
+		function populateEducationalRecords(educationalRecords) {
+			console.log('Populating educational records:', educationalRecords);
 
-		  // Sync header checkbox with individual rows
-		  $('#employeeTable tbody').on('change', 'input.selectsingle', function () {
-			const allBoxes = table.rows({ page: 'current' }).nodes().to$().find('input.selectsingle');
-			const checkedBoxes = allBoxes.filter(':checked').length;
-			$('#selectAll').prop('checked', allBoxes.length === checkedBoxes);
-		  });
+			educationalRecords.forEach(function (record, index) {
+				const examTitle = record.examTitle || '';
+				const institution = record.institution || '';
+				const result = record.result || '';
+				const passingYear = record.passingYear || '';
 
-		  // Autofocus and Enter key navigation
-		  $('#Name').focus();
+				// Editable row instead of plain text
+				const $newRow = $(`
+					<tr data-row-type="data" data-index="${index}">
+						<td>
+							<input type="text" class="form-control"
+								name="EducationRecords[${index}].ExamTitle"
+								value="${examTitle}" placeholder="Enter exam title" />
+							<input type="hidden" name="EducationRecords[${index}].EducationalinfoID" value="${record.educationalinfoID || 0}" />
+							<input type="hidden" name="EducationRecords[${index}].AutoId" value="${record.autoId || 0}" />
+						</td>
+						<td>
+							<input type="text" class="form-control"
+								name="EducationRecords[${index}].Institution"
+								value="${institution}" placeholder="Enter institution" />
+						</td>
+						<td>
+							<input type="text" class="form-control"
+								name="EducationRecords[${index}].Result"
+								value="${result}" placeholder="Result" />
+						</td>
+						<td>
+							<input type="text" class="form-control"
+								name="EducationRecords[${index}].PassingYear"
+								value="${passingYear}" placeholder="Year" />
+						</td>
+						<td class="text-center">
+							<button type="button" class="btn btn-danger btn-sm"
+								onclick="removeDataRow(this)"
+								style="padding:2px 6px; font-size:12px;">×</button>
+						</td>
+					</tr>
+				`);
 
-		  $('input,select,textarea').on('keydown', function (e) {
-			if (e.key === 'Enter') {
-			  e.preventDefault();
-			  let fields = $('input,select,textarea').filter(':visible:not(:disabled)');
-			  let index = fields.index(this);
-			  if (index > -1 && index + 1 < fields.length) {
-				fields.eq(index + 1).focus();
-			  }
-			}
-		  });
-		});
+				// Insert before the input row (last row)
+				const $inputRow = $('#EducationinfoTableBody tr:last-child');
+				$newRow.insertBefore($inputRow);
+			});
 
-		//Functionality of Master Table
-		let educationRowIndex = 0;
+			educationRowIndex = educationalRecords.length; // Update index
+			updateRemoveButton();
+		}
 
-		function addEducationinfoRow() {
-			const examTitle = $('#EducationinfoTableBody input[placeholder="Enter exam title"]').val().trim();
-			const institution = $('#EducationinfoTableBody input[placeholder="Enter institution"]').val().trim();
-			const result = $('#EducationinfoTableBody input[placeholder="Result"]').val().trim();
-			const passingYear = $('#EducationinfoTableBody input[placeholder="Year"]').val();
+
+		// Enhanced addEducationRow function to handle both new and edit scenarios
+		function addEducationRow() {
+			const $inputRow = $('#EducationinfoTableBody tr:last-child');
+			const examTitle = $inputRow.find('input[placeholder="Enter exam title"]').val().trim();
+			const institution = $inputRow.find('input[placeholder="Enter institution"]').val().trim();
+			const result = $inputRow.find('input[placeholder="Result"]').val().trim();
+			const passingYear = $inputRow.find('input[placeholder="Year"]').val();
 
 			// Validation
 			if (!examTitle || !institution) {
@@ -1061,10 +997,233 @@
 				return;
 			}
 
-			// Create new data row
-			const $tableBody = $('#EducationinfoTableBody');
-			const $inputRow = $('#EducationinfoTableBody tr:last-child'); // input row reference
+			// Create New Row
 			const $newRow = $(`
+				<tr data-row-type="data" data-index="${educationRowIndex}">
+					<td>
+						${examTitle}
+						<input type="hidden" name="EducationRecords[${educationRowIndex}].ExamTitle" value="${examTitle}" />
+						<input type="hidden" name="EducationRecords[${educationRowIndex}].EducationalinfoID" value="0" />
+						<input type="hidden" name="EducationRecords[${educationRowIndex}].AutoId" value="0" />
+					</td>
+					<td>
+						${institution}
+						<input type="hidden" name="EducationRecords[${educationRowIndex}].Institution" value="${institution}" />
+					</td>
+					<td>
+						${result}
+						<input type="hidden" name="EducationRecords[${educationRowIndex}].Result" value="${result ? parseFloat(result) : ''}" />
+					</td>
+					<td>
+						${passingYear}
+						<input type="hidden" name="EducationRecords[${educationRowIndex}].PassingYear" value="${passingYear ? parseInt(passingYear) : ''}" />
+					</td>
+					<td class="text-center">
+						<button type="button" class="btn btn-danger btn-sm" onclick="removeDataRow(this)" style="padding:2px 6px; font-size:12px;">×</button>
+					</td>
+				</tr>
+			`);
+
+			$newRow.insertBefore($inputRow);
+			educationRowIndex++;
+			clearEducationInputs();
+			updateRemoveButton();
+		}
+
+
+
+
+					//Delete Btn Functionality
+
+					$('#deleteBtn').click(function () {
+						var ids = [];
+						$('.selectsingle:checked').each(function () {
+							ids.push($(this).val());
+							console.log(ids);
+						});
+						if (ids.length == 0) {
+							var employeeId = $('#AutoID').val();
+							if (employeeId && employeeId.trim() !== '') {
+								if (confirm('Are you sure you want to delete this employee?')) {
+									$.ajax({
+										url: '/EmployeeInfoController1/Delete',
+										type: 'POST',
+										data: { id: employeeId },
+										success: function (response) {
+											if (response.success) {
+												$('#row_' + employeeId).remove();
+												alert('Employee Deleted successfully');
+												 location.reload();
+												$('#employeeForm')[0].reset();
+											} else {
+												alert('Error deleting employee');
+											}
+										},
+										error: function () {
+											alert('Error deleting employee');
+										}
+									});
+								}
+							} else {
+								alert('Please select an employee to delete');
+							}
+						} else {
+							if (confirm('Are you sure you want to delete this ' + ids.length + ' employees?')) {
+								$.ajax({
+									url: '/EmployeeInfoController1/BulkDelete',
+									type: 'POST',
+									contentType: 'application/json',
+									data: JSON.stringify(ids),
+									success: function (response) {
+										if (response.success) {
+											alert('Employees deleted successfully');
+											location.reload();
+										}
+									},
+									error: function () {
+										alert('Error detecting while deleting employees');
+									}
+								});
+							}
+						}
+					});
+
+					$('#selectAll').on ('click',function(){
+						var isChecked = $(this).prop('checked');
+						console.log(isChecked);
+						$('.selectsingle').prop('checked',isChecked);
+					});
+
+		//Function Paginated Tables
+
+								$(document).ready(function () {
+			const $table = $('#employeeTable');
+			if ($.fn.DataTable.isDataTable($table)) {
+					$table.DataTable().clear().destroy();
+			}
+			const table = $table.DataTable({
+					processing: true,
+					serverSide: true,
+					ajax: {
+					  url: '/EmployeeInfoController1/GetPaginated',
+					  type: 'POST',
+					  dataSrc: 'data',
+					},
+					columns: [
+					  {
+						data: null,
+						orderable: false,
+						searchable: false,
+						className: 'text-center align-middle',
+						render: function (_, __, row) {
+						  return `<input type="checkbox" class="selectsingle" name="selectedItems" value="${row.autoID}" />`;
+						}
+					  },
+					  { data: 'employeeID',className:'text-center align-middle' },
+					  { data: 'name',className:'text-center align-middle text-nowarp'},
+							  { data: 'designation', className: 'text-center align-middle' },
+						{ data: 'department', className: 'text-center align-middle' },
+							{
+					data: 'devSkills',
+					className: 'text-center',
+					render: function (data) {
+						return data && data !== '' ? data : '<span class="text-muted"></span>';
+					}
+						},
+
+					  {
+						data: 'grossSalary',
+						className: 'text-end fornt-weight-bold',
+						render: function (d) {
+						  return d == null || d === 0 ? '' : `<strong>${d.toLocaleString()}</strong>`;
+						}
+					  },
+					  {
+						data: 'joiningDate',
+						render: function (d) {
+						  if (!d) return '';
+						  const date = new Date(d);
+						  // Check for DateTime.MinValue (year 0001 shows as "01-01-1")
+						  if (date.getFullYear() === 1) {
+							return '';
+						  }
+						  const day = String(date.getDate()).padStart(2, '0');
+						  const month = String(date.getMonth() + 1).padStart(2, '0');
+						  const year = date.getFullYear();
+						  return `${day}/${month}/${year}`;
+						}
+					  },
+					  { data: 'phone' },
+					  {
+						data: 'photoPath',
+						className:'text-center  align-middle',
+						render: function (path) {
+						  return path
+							? `<img src="/Image/${path}" class="img-thumbnail" style="width:50px;height:50px;object-fit:cover;border-radius:5px;" />`
+							: `<span class="text-muted">👤</span>`;
+						}
+					  },
+					  {
+						data: null,
+						orderable: false,
+						searchable: false,
+						className: 'text-center',
+						render: function (_, __, row) {
+						  return `<button type="button" class="editBtn btn btn-sm btn-outline-secondary" data-id="${row.employeeID}">Edit</button>`;
+						}
+					  }
+					],
+					order: [[1, 'asc']],
+					autoWidth: false
+			});
+
+			  // “Select All” checkbox handler
+			  $('#selectAll').on('click', function () {
+				const checked = $(this).is(':checked');
+				$('#employeeTable tbody input.selectsingle').prop('checked', checked);
+			  });
+
+			  // Sync header checkbox with individual rows
+			  $('#employeeTable tbody').on('change', 'input.selectsingle', function () {
+				const allBoxes = table.rows({ page: 'current' }).nodes().to$().find('input.selectsingle');
+				const checkedBoxes = allBoxes.filter(':checked').length;
+				$('#selectAll').prop('checked', allBoxes.length === checkedBoxes);
+			  });
+
+			  // Autofocus and Enter key navigation
+			  $('#Name').focus();
+
+			  $('input,select,textarea').on('keydown', function (e) {
+				if (e.key === 'Enter') {
+				  e.preventDefault();
+				  let fields = $('input,select,textarea').filter(':visible:not(:disabled)');
+				  let index = fields.index(this);
+				  if (index > -1 && index + 1 < fields.length) {
+					fields.eq(index + 1).focus();
+				  }
+				}
+			  });
+			});
+
+
+			//Functionality of Master Table
+			let educationRowIndex = 0;
+
+			function addEducationinfoRow() {
+				const $inputRow = $('#EducationinfoTableBody tr:last-child');
+				const examTitle = $inputRow.find('input[placeholder="Enter exam title"]').val().trim();
+				const institution = $inputRow.find('input[placeholder="Enter institution"]').val().trim();
+				const result = $inputRow.find('input[placeholder="Result"]').val().trim();
+				const passingYear = $inputRow.find('input[placeholder="Year"]').val();
+
+				// Validation
+				if (!examTitle || !institution) {
+					alert('Please enter Exam Title and Institution');
+					return;
+				}
+
+				// Create new data row
+								const $newRow = $(`
 				<tr data-row-type="data" data-index="${educationRowIndex}">
 					<td>
 						${examTitle}
@@ -1076,11 +1235,11 @@
 					</td>
 					<td>
 						${result}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].Result" value="${result}" />
+						<input type="hidden" name="EducationRecords[${educationRowIndex}].Result" value="${result ? parseFloat(result) : ''}" />
 					</td>
 					<td>
 						${passingYear}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].PassingYear" value="${passingYear}" />
+						<input type="hidden" name="EducationRecords[${educationRowIndex}].PassingYear" value="${passingYear ? parseInt(passingYear) : ''}" />
 					</td>
 					<td class="text-center">
 						<button type="button" class="btn btn-danger btn-sm" onclick="removeDataRow(this)" style="padding:2px 6px; font-size:12px;">×</button>
@@ -1088,206 +1247,186 @@
 				</tr>
 			`);
 
-			// Insert before the input row
-			$newRow.insertBefore($inputRow);
-			educationRowIndex++;
-			clearEducationInputs();
-			updateRemoveButton();
-		}
+				$newRow.insertBefore($inputRow);
+				educationRowIndex++;
+				clearEducationInputs();
+				updateRemoveButton();
+			}
 
-		function removeEducationinfoRow() {
-			const $tableBody = $('#EducationinfoTableBody');
-			const $dataRows = $tableBody.find('tr[data-row-type="data"]');
+			function removeEducationinfoRow() {
+				const $dataRows = $('#EducationinfoTableBody tr[data-row-type="data"]');
+				if ($dataRows.length > 0) {
+					$dataRows.last().remove();
+					reindexEducationRows();
+					updateRemoveButton();
+				}
+			}
 
-			if ($dataRows.length > 0) {
-				// Remove the last added data row
-				$dataRows.last().remove();
-				// Re-index remaining rows
+			function removeDataRow(button) {
+				$(button).closest('tr').remove();
 				reindexEducationRows();
 				updateRemoveButton();
 			}
-		}
 
-		// Remove specific row when × button is clicked
-		function removeDataRow(button) {
-			$(button).closest('tr').remove();
-			reindexEducationRows();
-			updateRemoveButton();
-		}
+			function clearEducationInputs() {
+				const $inputRow = $('#EducationinfoTableBody tr:last-child');
+				$inputRow.find('input').val('');
+			}
 
-		// Clear only input row
-		function clearEducationInputs() {
-			const $inputRow = $('#EducationinfoTableBody tr:last-child');
-			$inputRow.find('input[placeholder="Enter exam title"]').val('');
-			$inputRow.find('input[placeholder="Enter institution"]').val(''); 
-			$inputRow.find('input[placeholder="Result"]').val('');
-			$inputRow.find('input[placeholder="Year"]').val('');
-		}
+			function reindexEducationRows() {
+				$('#EducationinfoTableBody tr[data-row-type="data"]').each(function (index) {
+					$(this).attr('data-index', index);
+					$(this).find('input[type="hidden"]').each(function () {
+						const name = $(this).attr('name');
+						if (name) {
+							$(this).attr('name', name.replace(/\[\d+\]/, `[${index}]`));
+						}
+					});
+				});
+				educationRowIndex = $('#EducationinfoTableBody tr[data-row-type="data"]').length;
+			}
 
-		function reindexEducationRows() {
-			const $tableBody = $('#EducationinfoTableBody');
-			const $dataRows = $tableBody.find('tr[data-row-type="data"]');
+			function updateRemoveButton() {
+				const hasRows = $('#EducationinfoTableBody tr[data-row-type="data"]').length > 0;
+				$('#removeEduinfoBtn').prop('disabled', !hasRows);
+			}
 
-			$dataRows.each(function (index, row) {
-				$(row).attr('data-index', index);
-				$(row).find('input[type="hidden"]').each(function () {
-					const name = $(this).attr('name');
-					if (name) {
-						const newName = name.replace(/\[\d+\]/, `[${index}]`);
-						$(this).attr('name', newName);
+			function clearAllEducationData() {
+				$('#EducationinfoTableBody tr[data-row-type="data"]').remove();
+				clearEducationInputs();
+				educationRowIndex = 0;
+				updateRemoveButton();
+			}
+
+			// Initialize on page load
+			$(document).ready(function () {
+				$('#EducationinfoTableBody').on('keypress', 'input', function (e) {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						addEducationinfoRow();
 					}
 				});
+				updateRemoveButton();
 			});
 
-			educationRowIndex = $dataRows.length;
-		}
+					//  $(document).ready(function () {
+					// 	$('#SearchEmp').on('keyup', function () {
+					// 		var searchValue = $(this).val();
 
-		function updateRemoveButton() {
-			const $tableBody = $('#EducationinfoTableBody');
-			const $dataRows = $tableBody.find('tr[data-row-type="data"]');
-			const $removeBtn = $('#removeEduinfoBtn');
+					// 		$.ajax({
+					// 			url: '/EmployeeInfoController1/Getall',
+					// 			type: 'GET',
+					// 			data: { search: searchValue },
+					// 			success: function (data) {
+					// 			   showTableData(data);
+					// 			},
+					// 			error: function () {
+					// 				alert('Error searching employees');
+					// 			}
+					// 		});
+					// 	});
+					// });
 
-			$removeBtn.prop('disabled', $dataRows.length === 0);
-		}
+					// function loadDesignationTable() {
+					// 	var searchitem = $('#SearchEmp').val();
+					// 	fetch(`/EmployeeInfoController1/Getall?search=${encodeURIComponent(searchitem)}`)
+					// 		.then(response => response.json())
+					// 		.then(data => {
+					// 			showTableData(data); Display filtered data
+					// 		});
+					// }
+					// 		function showTableData(data) {
+					// 			var tbody = $('#employeeTableBody');
+					// 			tbody.empty(); Clear existing rows
+					// 			if (data.length > 0) {
+					// 				data.forEach(emp => {
+					// 					var row = `<tr>
+					// 						<td class="text-center" width="10%"><input type="checkbox" class="selectsingle" name="selectedItems" value="${emp.autoID}"/></td>
+					// 						<td>${emp.employeeID}</td>
+					// 						<td>${emp.name}</td>
+					// 						<td>${emp.designation}</td>
+					// 						<td>${emp.department}</td>
+					// 						<td>${emp.grossSalary}</td>
+					// 						<td>${new Date(emp.joiningDate).toISOString().split('T')[0]}</td>
+					// 						<td>${emp.phone}</td>
+					// 							<td>
+					// 						${emp.photoPath
+					// 						? `<img src="image/${emp.photoPath}" width="40"
+					// 						onerror="this.onerror=null; this.src='';" />`
+					// 						: `<i class="bi bi-person-circle fs-4"></i>`}
+					// 						</td>
+					// 						<td><button type="button" class="editBtn btn btn-sm btn-outline-secondary w-10%" data-id="${emp.employeeID}">Edit</button></td>
+					// 					</tr>`;
+					// 					tbody.append(row);
+					// 				});
+					// 			} else {
+					// 				tbody.append('<tr><td colspan="10" class="text-center">No Data Found</td></tr>');
+					// 			}
 
-		function clearAllEducationData() {
-			$('#EducationinfoTableBody tr[data-row-type="data"]').remove();
-			clearEducationInputs();
-			educationRowIndex = 0;
-			updateRemoveButton();
-		}
-
-		// Initialize on page load
-		$(document).ready(function () {
-			// Add Enter key support
-			$('#EducationinfoTableBody').on('keypress', 'input', function (e) {
-				if (e.key === 'Enter') {
-					e.preventDefault();
-					addEducationinfoRow();
-				}
-			});
-			updateRemoveButton();
-		});
-
-
-				//  $(document).ready(function () {
-				// 	$('#SearchEmp').on('keyup', function () {
-				// 		var searchValue = $(this).val();
-
-				// 		$.ajax({
-				// 			url: '/EmployeeInfoController1/Getall',
-				// 			type: 'GET',
-				// 			data: { search: searchValue },
-				// 			success: function (data) {
-				// 			   showTableData(data);
-				// 			},
-				// 			error: function () {
-				// 				alert('Error searching employees');
-				// 			}
-				// 		});
-				// 	});
-				// });
-
-				// function loadDesignationTable() {
-				// 	var searchitem = $('#SearchEmp').val();
-				// 	fetch(`/EmployeeInfoController1/Getall?search=${encodeURIComponent(searchitem)}`)
-				// 		.then(response => response.json())
-				// 		.then(data => {
-				// 			showTableData(data); Display filtered data
-				// 		});
-				// }
-				// 		function showTableData(data) {
-				// 			var tbody = $('#employeeTableBody');
-				// 			tbody.empty(); Clear existing rows
-				// 			if (data.length > 0) {
-				// 				data.forEach(emp => {
-				// 					var row = `<tr>
-				// 						<td class="text-center" width="10%"><input type="checkbox" class="selectsingle" name="selectedItems" value="${emp.autoID}"/></td>
-				// 						<td>${emp.employeeID}</td>
-				// 						<td>${emp.name}</td>
-				// 						<td>${emp.designation}</td>
-				// 						<td>${emp.department}</td>
-				// 						<td>${emp.grossSalary}</td>
-				// 						<td>${new Date(emp.joiningDate).toISOString().split('T')[0]}</td>
-				// 						<td>${emp.phone}</td>
-				// 							<td>
-				// 						${emp.photoPath
-				// 						? `<img src="image/${emp.photoPath}" width="40"
-				// 						onerror="this.onerror=null; this.src='';" />`
-				// 						: `<i class="bi bi-person-circle fs-4"></i>`}
-				// 						</td>
-				// 						<td><button type="button" class="editBtn btn btn-sm btn-outline-secondary w-10%" data-id="${emp.employeeID}">Edit</button></td>
-				// 					</tr>`;
-				// 					tbody.append(row);
-				// 				});
-				// 			} else {
-				// 				tbody.append('<tr><td colspan="10" class="text-center">No Data Found</td></tr>');
-				// 			}
-
-				// 		}
+					// 		}
 
 
-	
 
-		//Development Skills Section
 
-				
-		// 		$(document).ready(function() {
-		// 	$('#DevelopmentSkills').multiselect({
-		// 		includeSelectAllOption: true,
-		// 		selectAllText: 'Select All Skills',
-		// 		nonSelectedText: 'Select Skills...',
-		// 		nSelectedText: ' skills selected',
-		// 		numberDisplayed: 2,
-		// 		enableFiltering: true,
-		// 		filterPlaceholder: 'Search skills...',
-		// 		maxHeight: 300,
-		// 		buttonClass: 'form-control text-start',
-		// 		buttonWidth: '100%'
-		// 	});
-		// });
+			//Development Skills Section
 
-		//Utility functions
-		// function getSelectedSkills() {
-		// 	return $('#DevelopmentSkills').val() || [];
-		// }
 
-		// function setSelectedSkills(skillsArray) {
-		// 	$('#DevelopmentSkills').multiselect('select', skillsArray);
-		// }
+			// 		$(document).ready(function() {
+			// 	$('#DevelopmentSkills').multiselect({
+			// 		includeSelectAllOption: true,
+			// 		selectAllText: 'Select All Skills',
+			// 		nonSelectedText: 'Select Skills...',
+			// 		nSelectedText: ' skills selected',
+			// 		numberDisplayed: 2,
+			// 		enableFiltering: true,
+			// 		filterPlaceholder: 'Search skills...',
+			// 		maxHeight: 300,
+			// 		buttonClass: 'form-control text-start',
+			// 		buttonWidth: '100%'
+			// 	});
+			// });
 
-		// function clearAllSkills() {
-		// 	$('#DevelopmentSkills').multiselect('deselectAll', false);
-		// 	$('#DevelopmentSkills').multiselect('updateButtonText');
-		// }
+			//Utility functions
+			// function getSelectedSkills() {
+			// 	return $('#DevelopmentSkills').val() || [];
+			// }
+
+			// function setSelectedSkills(skillsArray) {
+			// 	$('#DevelopmentSkills').multiselect('select', skillsArray);
+			// }
+
+			// function clearAllSkills() {
+			// 	$('#DevelopmentSkills').multiselect('deselectAll', false);
+			// 	$('#DevelopmentSkills').multiselect('updateButtonText');
+			// }
 
 
 
 
 
-		// document.addEventListener('DOMContentLoaded', function () {
-		// 	const skillSelect = document.getElementById('DevelopmentSkills');
+			// document.addEventListener('DOMContentLoaded', function () {
+			// 	const skillSelect = document.getElementById('DevelopmentSkills');
 
-		// 	skillSelect.addEventListener('change', function () {
-		// 		const selectedOptions = Array.from(skillSelect.selectedOptions).map(option => option.value);
-		// 		console.log('Selected Skills:', selectedOptions);
-		// 	});
+			// 	skillSelect.addEventListener('change', function () {
+			// 		const selectedOptions = Array.from(skillSelect.selectedOptions).map(option => option.value);
+			// 		console.log('Selected Skills:', selectedOptions);
+			// 	});
 
-		// 	function setSelectedSkills(skillArray) {
-		// 		const skillSelect = document.getElementById('DevelopmentSkills');
-		// 		Array.from(skillSelect.options).forEach(option => {
-		// 			option.selected = skillArray.includes(option.value);
-		// 		});
-		// 	}
+			// 	function setSelectedSkills(skillArray) {
+			// 		const skillSelect = document.getElementById('DevelopmentSkills');
+			// 		Array.from(skillSelect.options).forEach(option => {
+			// 			option.selected = skillArray.includes(option.value);
+			// 		});
+			// 	}
 
-		// 	function getSelectedSkills() {
-		// 		return Array.from(skillSelect.selectedOptions).map(option => option.value);
-		// 	}
+			// 	function getSelectedSkills() {
+			// 		return Array.from(skillSelect.selectedOptions).map(option => option.value);
+			// 	}
 
-		// 	// Expose functions globally
-		// 	window.getSelectedSkills = getSelectedSkills;
-		// 	window.setSelectedSkills = setSelectedSkills;
-		// });
+			// 	// Expose functions globally
+			// 	window.getSelectedSkills = getSelectedSkills;
+			// 	window.setSelectedSkills = setSelectedSkills;
+			// });
 
 
 
@@ -1295,77 +1434,77 @@
 
 
 
-		// Developmentskillss sections Comment
+			// Developmentskillss sections Comment
 
 
 
 
 
-		// let skillsDropdownOpen = false;
+			// let skillsDropdownOpen = false;
 
-		// function toggleSkillsDropdown() {
-		// 	const content = document.getElementById('skillsDropdownContent');
-		// 	skillsDropdownOpen = !skillsDropdownOpen;
+			// function toggleSkillsDropdown() {
+			// 	const content = document.getElementById('skillsDropdownContent');
+			// 	skillsDropdownOpen = !skillsDropdownOpen;
 
-		// 	if (skillsDropdownOpen) {
-		// 		content.classList.add('show');
-		// 	} else {
-		// 		content.classList.remove('show');
-		// 	}
-		// }
+			// 	if (skillsDropdownOpen) {
+			// 		content.classList.add('show');
+			// 	} else {
+			// 		content.classList.remove('show');
+			// 	}
+			// }
 
-		// // Close dropdown if clicking outside
-		// document.addEventListener('click', function (event) {
-		// 	const content = document.getElementById('skillsDropdownContent');
-		// 	if (!content.contains(event.target) && !event.target.closest('#skillsDropdownButton')) {
-		// 		content.classList.remove('show');
-		// 		skillsDropdownOpen = false;
-		// 	}
-		// });
+			// // Close dropdown if clicking outside
+			// document.addEventListener('click', function (event) {
+			// 	const content = document.getElementById('skillsDropdownContent');
+			// 	if (!content.contains(event.target) && !event.target.closest('#skillsDropdownButton')) {
+			// 		content.classList.remove('show');
+			// 		skillsDropdownOpen = false;
+			// 	}
+			// });
 
-		// document.addEventListener('DOMContentLoaded', function () {
-		// 	const checkboxes = document.querySelectorAll('#skillsDropdownContent input[type="checkbox"]');
-		// 	const toggleInput = document.getElementById('skillsDropdownToggle');
-		// 	const hiddenInput = document.getElementById('DevelopmentSkills');
+			// document.addEventListener('DOMContentLoaded', function () {
+			// 	const checkboxes = document.querySelectorAll('#skillsDropdownContent input[type="checkbox"]');
+			// 	const toggleInput = document.getElementById('skillsDropdownToggle');
+			// 	const hiddenInput = document.getElementById('DevelopmentSkills');
 
-		// 	// Handle checkbox changes
-		// 	checkboxes.forEach(function (checkbox) {
-		// 		checkbox.addEventListener('change', function () {
-		// 			updateSelectedSkills();
-		// 		});
-		// 	});
+			// 	// Handle checkbox changes
+			// 	checkboxes.forEach(function (checkbox) {
+			// 		checkbox.addEventListener('change', function () {
+			// 			updateSelectedSkills();
+			// 		});
+			// 	});
 
-		// 	function updateSelectedSkills() {
-		// 		const selectedSkills = [];
-		// 		checkboxes.forEach(function (checkbox) {
-		// 			if (checkbox.checked) {
-		// 				selectedSkills.push(checkbox.value);
-		// 			}
-		// 		});
-		// 		const skillsString = selectedSkills.join(', ');
-		// 		toggleInput.value = skillsString; // Show selected skills in toggle input
-		// 		hiddenInput.value = skillsString; // Store in hidden input if needed
-		// 		return skillsString;
-		// 	}
+			// 	function updateSelectedSkills() {
+			// 		const selectedSkills = [];
+			// 		checkboxes.forEach(function (checkbox) {
+			// 			if (checkbox.checked) {
+			// 				selectedSkills.push(checkbox.value);
+			// 			}
+			// 		});
+			// 		const skillsString = selectedSkills.join(', ');
+			// 		toggleInput.value = skillsString; // Show selected skills in toggle input
+			// 		hiddenInput.value = skillsString; // Store in hidden input if needed
+			// 		return skillsString;
+			// 	}
 
-		// 	function getSelectedSkills() {
-		// 		return Array.from(checkboxes)
-		// 			.filter(checkbox => checkbox.checked)
-		// 			.map(checkbox => checkbox.value);
-		// 	}
+			// 	function getSelectedSkills() {
+			// 		return Array.from(checkboxes)
+			// 			.filter(checkbox => checkbox.checked)
+			// 			.map(checkbox => checkbox.value);
+			// 	}
 
-		// 	function setSelectedSkills(skillsArray) {
-		// 		checkboxes.forEach(function (checkbox) {
-		// 			checkbox.checked = skillsArray.includes(checkbox.value);
-		// 		});
-		// 		updateSelectedSkills();
-		// 	}
+			// 	function setSelectedSkills(skillsArray) {
+			// 		checkboxes.forEach(function (checkbox) {
+			// 			checkbox.checked = skillsArray.includes(checkbox.value);
+			// 		});
+			// 		updateSelectedSkills();
+			// 	}
 
-		// 	// Expose functions globally
-		// 	window.getSelectedSkills = getSelectedSkills;
-		// 	window.setSelectedSkills = setSelectedSkills;
-		// 	window.updateSelectedSkills = updateSelectedSkills;
-		// });
-	
+			// 	// Expose functions globally
+			// 	window.getSelectedSkills = getSelectedSkills;
+			// 	window.setSelectedSkills = setSelectedSkills;
+			// 	window.updateSelectedSkills = updateSelectedSkills;
+			// });
+
 	</script>
 	}

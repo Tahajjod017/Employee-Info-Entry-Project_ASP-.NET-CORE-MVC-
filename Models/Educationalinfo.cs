@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace EmployeeMvc.Models
 {
@@ -7,19 +8,20 @@ namespace EmployeeMvc.Models
         Educationalinfo
     {
         [Key]
-        public int EducationalinfoId { get; set; }
+        public int EducationalinfoID { get; set; }
         [ForeignKey("Employeeinfo")]
-        public int EmployeeID { get; set; }
+        public string EmployeeID { get; set; }
+
         public int AutoId { get; set; }
         [StringLength(100)]
-        public string? Institution { get; set; }
         public string? ExamTitle { get; set; }
-        [StringLength(50)]
-        public string? Result { get; set; }
-        [StringLength(50)]
+        public string? Institution { get; set; }
+       
+        public decimal? Result { get; set; }
         public int? PassingYear { get; set; }
         //Navigation Property
-        public virtual Employeeinfo Employeeinfo { get; set; }
+        [JsonIgnore]
+        public virtual Employeeinfo? Employeeinfo { get; set; }
 
     }
 }

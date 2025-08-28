@@ -1,12 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace EmployeeMvc.Models
 {
     public class Employeeinfo
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int AutoID { get; set; }
         [Key]
-        public int AutoID { get; set; } 
         public string EmployeeID { get; set; }
         [StringLength(100)]
         public string Name { get; set; }
@@ -25,7 +28,8 @@ namespace EmployeeMvc.Models
         [NotMapped]
         public IFormFile? photo { get; set; }
         //Navigation for Fogen key
-        public virtual ICollection<Educationalinfo> Educationalinfos { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<Educationalinfo> Educationalinfos { get; set; } = new List<Educationalinfo>();
 
 
     }

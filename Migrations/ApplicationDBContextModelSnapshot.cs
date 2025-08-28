@@ -319,53 +319,52 @@ namespace EmployeeMvc.Migrations
 
             modelBuilder.Entity("EmployeeMvc.Models.Educationalinfo", b =>
                 {
-                    b.Property<int>("EducationalinfoId")
+                    b.Property<int>("EducationalinfoID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EducationalinfoId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EducationalinfoID"));
 
                     b.Property<int>("AutoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EmployeeID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeinfoAutoID")
-                        .HasColumnType("int");
+                    b.Property<string>("EmployeeID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ExamTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Institution")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("Institution")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("PassingYear")
-                        .HasMaxLength(50)
                         .HasColumnType("int");
 
-                    b.Property<string>("Result")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<decimal?>("Result")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("EducationalinfoId");
+                    b.HasKey("EducationalinfoID");
 
-                    b.HasIndex("EmployeeinfoAutoID");
+                    b.HasIndex("EmployeeID");
 
                     b.ToTable("Educationalinfos");
                 });
 
             modelBuilder.Entity("EmployeeMvc.Models.Employeeinfo", b =>
                 {
+                    b.Property<string>("EmployeeID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("AutoID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AutoID"));
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Department")
                         .HasMaxLength(50)
@@ -379,10 +378,6 @@ namespace EmployeeMvc.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EmployeeID")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("GrossSalary")
@@ -404,16 +399,20 @@ namespace EmployeeMvc.Migrations
                     b.Property<string>("PhotoPath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("AutoID");
+                    b.HasKey("EmployeeID");
 
                     b.ToTable("Employeeinfos");
                 });
 
             modelBuilder.Entity("EmployeeMvc.Models.Educationalinfo", b =>
                 {
-                    b.HasOne("EmployeeMvc.Models.Employeeinfo", null)
+                    b.HasOne("EmployeeMvc.Models.Employeeinfo", "Employeeinfo")
                         .WithMany("Educationalinfos")
-                        .HasForeignKey("EmployeeinfoAutoID");
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employeeinfo");
                 });
 
             modelBuilder.Entity("EmployeeMvc.Models.Employeeinfo", b =>

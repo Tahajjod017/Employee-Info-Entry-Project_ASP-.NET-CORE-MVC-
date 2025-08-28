@@ -87,132 +87,154 @@ namespace EmployeeMvc.Controllers
 
         }
         [HttpPost]
-public async Task<IActionResult> Save(Employeeinfo employee, string[] selectedDevSkills, List<Educationalinfo> EducationRecords)
-{
-    if (ModelState.IsValid)
-    {
-        bool isDuplicate = await IsDuplicate(employee.Name, employee.EmployeeID, employee.Phone);
-        if (isDuplicate)
+        public async Task<IActionResult> Save(Employeeinfo employee, string[] selectedDevSkills, List<Educationalinfo> EducationRecords)
         {
-            TempData["ErrorMessage"] = "Data already exists with this name or phone number.";
-            return RedirectToAction("Index");
-        }
 
-        if (employee.AutoID == 0)
-        {
-            // New Employee
-            if (employee.photo != null)
+            // Add debug logging
+            if (!ModelState.IsValid)
             {
-                string? uniqueFileName = GetUploadFileName(employee);
-                employee.PhotoPath = uniqueFileName;
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => new { Field = x.Key, Errors = x.Value.Errors.Select(e => e.ErrorMessage) })
+                    .ToList();
+
+                return Json(new { success = false, message = "Validation failed", errors = errors });
             }
 
-            var emp = new Employeeinfo();
-            emp.EmployeeID = employee.EmployeeID;
-            emp.Name = employee.Name;
-            emp.Phone = employee.Phone;
-            emp.Department = employee.Department ?? string.Empty;
-            emp.Designation = employee.Designation ?? string.Empty;
-            emp.Address = employee.Address ?? string.Empty;
-            emp.Email = employee.Email ?? string.Empty;
-            emp.PhotoPath = employee.PhotoPath ?? string.Empty;
-            emp.JoiningDate = employee.JoiningDate ?? DateTime.MinValue;
-            emp.GrossSalary = employee.GrossSalary ?? 0;
-            emp.DevSkills = string.Join(",", selectedDevSkills);
-            
-            dbContext.Employeeinfos.Add(emp);
-            await dbContext.SaveChangesAsync(); // Save to get AutoId
-
-            // Save Education Records
-            if (EducationRecords != null && EducationRecords.Count > 0)
+            try
             {
-                foreach (var educationRecord in EducationRecords)
+                bool isDuplicate = await IsDuplicate(employee.Name, employee.EmployeeID, employee.Phone);
+                if (isDuplicate)
                 {
-                    if (!string.IsNullOrWhiteSpace(educationRecord.ExamTitle) && 
-                        !string.IsNullOrWhiteSpace(educationRecord.Institution))
-                    {
-                        var eduInfo = new Educationalinfo
-                        {
-                            AutoId = emp.AutoID, // Use the saved employee's AutoID
-                            EmployeeID = emp.AutoID, // Foreign key reference
-                            ExamTitle = educationRecord.ExamTitle,
-                            Institution = educationRecord.Institution,
-                            Result = educationRecord.Result,
-                            PassingYear = educationRecord.PassingYear
-                        };
-                        dbContext.Educationalinfos.Add(eduInfo);
-                    }
-                }
-                await dbContext.SaveChangesAsync();
-            }
-        }
-        else
-        {
-            // Update existing employee
-            var emp = await dbContext.Employeeinfos.FindAsync(employee.AutoID);
-            if (emp != null)
-            {
-                if (employee.photo != null)
-                {
-                    if (!string.IsNullOrEmpty(emp.PhotoPath))
-                    {
-                        var photoPath = Path.Combine(webHost.WebRootPath, "Image", Path.GetFileName(emp.PhotoPath));
-                        try
-                        {
-                            System.IO.File.Delete(photoPath);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error deleting file: {ex.Message}");
-                        }
-                    }
-                    string? uniqueFileName = GetUploadFileName(employee);
-                    emp.PhotoPath = uniqueFileName;
+                    return Json(new { success = false, message = "Data already exists with this name or phone number." });
                 }
 
-                emp.EmployeeID = employee.EmployeeID;
-                emp.Name = employee.Name;
-                emp.Phone = employee.Phone;
-                emp.Department = employee.Department ?? string.Empty;
-                emp.Designation = employee.Designation ?? string.Empty;
-                emp.Address = employee.Address ?? string.Empty;
-                emp.Email = employee.Email ?? string.Empty;
-                emp.JoiningDate = employee.JoiningDate ?? DateTime.MinValue;
-                emp.GrossSalary = string.IsNullOrWhiteSpace(employee.GrossSalary?.ToString()) ? null : employee.GrossSalary;
-                emp.DevSkills = string.Join(",", selectedDevSkills);
-
-                // Update Education Records
-                // First, remove existing education records
-                var existingEducationRecords = dbContext.Educationalinfos.Where(e => e.AutoId == emp.AutoID);
-                dbContext.Educationalinfos.RemoveRange(existingEducationRecords);
-
-                // Add updated education records
-                if (EducationRecords != null && EducationRecords.Count > 0)
+                if (employee.AutoID == 0)
                 {
-                    foreach (var educationRecord in EducationRecords)
+                    // New Employee
+                    if (employee.photo != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(educationRecord.ExamTitle) && 
-                            !string.IsNullOrWhiteSpace(educationRecord.Institution))
+                        string? uniqueFileName = GetUploadFileName(employee);
+                        employee.PhotoPath = uniqueFileName;
+                    }
+
+                    var emp = new Employeeinfo();
+                    emp.EmployeeID = employee.EmployeeID;
+                    emp.Name = employee.Name;
+                    emp.Phone = employee.Phone;
+                    emp.Department = employee.Department ?? string.Empty;
+                    emp.Designation = employee.Designation ?? string.Empty;
+                    emp.Address = employee.Address ?? string.Empty;
+                    emp.Email = employee.Email ?? string.Empty;
+                    emp.PhotoPath = employee.PhotoPath ?? string.Empty;
+                    emp.JoiningDate = employee.JoiningDate ?? DateTime.MinValue;
+                    emp.GrossSalary = employee.GrossSalary ?? 0;
+                    emp.DevSkills = selectedDevSkills != null ? string.Join(",", selectedDevSkills) : string.Empty;
+
+                    dbContext.Employeeinfos.Add(emp);
+                    await dbContext.SaveChangesAsync(); // Save to get AutoId
+
+                    // Save Education Records
+                    Console.WriteLine("Education Records Count: " + (EducationRecords?.Count ?? 0));
+                    if (EducationRecords != null)
+                    {
+                        foreach (var edu in EducationRecords)
                         {
-                            var eduInfo = new Educationalinfo
+                            Console.WriteLine($"Exam: {edu.ExamTitle}, Institution: {edu.Institution}, Year: {edu.PassingYear}");
+                        }
+                    }
+
+                    if (EducationRecords != null && EducationRecords.Count > 0)
+                    {
+                        foreach (var educationRecord in EducationRecords)
+                        {
+                            if (!string.IsNullOrWhiteSpace(educationRecord.ExamTitle) &&
+                                !string.IsNullOrWhiteSpace(educationRecord.Institution))
                             {
-                                AutoId = emp.AutoID,
-                                EmployeeID = emp.AutoID, // Foreign key reference
-                                ExamTitle = educationRecord.ExamTitle,
-                                Institution = educationRecord.Institution,
-                                Result = educationRecord.Result,
-                                PassingYear = educationRecord.PassingYear
-                            };
-                            dbContext.Educationalinfos.Add(eduInfo);
+                                var eduInfo = new Educationalinfo
+                                {
+                                    EmployeeID = emp.EmployeeID,
+                                    ExamTitle = educationRecord.ExamTitle,
+                                    Institution = educationRecord.Institution,
+                                    Result = educationRecord.Result,
+                                    PassingYear = educationRecord.PassingYear
+                                };
+                                dbContext.Educationalinfos.Add(eduInfo);
+                            }
                         }
+                        await dbContext.SaveChangesAsync();
                     }
                 }
-                await dbContext.SaveChangesAsync();
+                else
+                {
+                    // Update existing employee
+                    var emp = await dbContext.Employeeinfos.FindAsync(employee.AutoID);
+                    if (emp != null)
+                    {
+                        if (employee.photo != null)
+                        {
+                            if (!string.IsNullOrEmpty(emp.PhotoPath))
+                            {
+                                var photoPath = Path.Combine(webHost.WebRootPath, "Image", Path.GetFileName(emp.PhotoPath));
+                                try
+                                {
+                                    System.IO.File.Delete(photoPath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error deleting file: {ex.Message}");
+                                }
+                            }
+                            string? uniqueFileName = GetUploadFileName(employee);
+                            emp.PhotoPath = uniqueFileName;
+                        }
+
+                        emp.EmployeeID = employee.EmployeeID;
+                        emp.Name = employee.Name;
+                        emp.Phone = employee.Phone;
+                        emp.Department = employee.Department ?? string.Empty;
+                        emp.Designation = employee.Designation ?? string.Empty;
+                        emp.Address = employee.Address ?? string.Empty;
+                        emp.Email = employee.Email ?? string.Empty;
+                        emp.JoiningDate = employee.JoiningDate ?? DateTime.MinValue;
+                        emp.GrossSalary = employee.GrossSalary;
+                        emp.DevSkills = selectedDevSkills != null ? string.Join(",", selectedDevSkills) : string.Empty;
+
+                        // Update Education Records
+                        var existingEducationRecords = dbContext.Educationalinfos.Where(e => e.EmployeeID == emp.EmployeeID);
+                        dbContext.Educationalinfos.RemoveRange(existingEducationRecords);
+
+                        // Add updated education records
+                        if (EducationRecords != null && EducationRecords.Count > 0)
+                        {
+                            foreach (var educationRecord in EducationRecords)
+                            {
+                                if (!string.IsNullOrWhiteSpace(educationRecord.ExamTitle) &&
+                                    !string.IsNullOrWhiteSpace(educationRecord.Institution))
+                                {
+                                    var eduInfo = new Educationalinfo
+                                    {
+                                        EmployeeID = emp.EmployeeID,
+                                        ExamTitle = educationRecord.ExamTitle,
+                                        Institution = educationRecord.Institution,
+                                        Result = educationRecord.Result,
+                                        PassingYear = educationRecord.PassingYear
+                                    };
+                                    dbContext.Educationalinfos.Add(eduInfo);
+                                }
+                            }
+                        }
+                        await dbContext.SaveChangesAsync();
+                    }
+                }
+
+                return Json(new { success = true, message = "Employee saved successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error saving employee: " + ex.Message });
             }
         }
-    }
-    return Json(new { success = true, message = "Employee saved successfully" });
-}
 
         private string? GetUploadFileName(Employeeinfo emp)
         {
@@ -316,16 +338,52 @@ public async Task<IActionResult> Save(Employeeinfo employee, string[] selectedDe
             int nextId = maxId + 1;
             return nextId.ToString("D3");
         }
-        public async Task<IActionResult> GetById(string id) //Edit btn controller
+        public async Task<IActionResult> GetById(string id)
         {
-            var employee = await dbContext.Employeeinfos
+            try
+            {
+                var employee = await dbContext.Employeeinfos
+                .Include(e => e.Educationalinfos) // Include educational records
                 .FirstOrDefaultAsync(e => e.EmployeeID == id);
 
-            if (employee != null)
-            {
-                return Json(employee);
+                if (employee != null)
+                {
+                    // Create a response object that includes educational records
+                    var response = new
+                    {
+                        employeeID = employee.EmployeeID,
+                        autoID = employee.AutoID,
+                        name = employee.Name,
+                        designation = employee.Designation,
+                        department = employee.Department,
+                        grossSalary = employee.GrossSalary,
+                        joiningDate = employee.JoiningDate,
+                        address = employee.Address,
+                        phone = employee.Phone,
+                        email = employee.Email,
+                        photoPath = employee.PhotoPath,
+                        // Add educational records
+                        educationalRecords = employee.Educationalinfos?.Select(edu => new Educationalinfo
+                        {
+                            EducationalinfoID = edu.EducationalinfoID,
+                            //AutoId = edu.AutoId,
+                            ExamTitle = edu.ExamTitle,
+                            Institution = edu.Institution,
+                            Result = edu.Result,
+                            PassingYear = edu.PassingYear
+                        }).ToList() ?? new List<Educationalinfo>()
+                    };
+
+                    return Json(response);
+                }
+                return Json(null);
             }
-            return Json(null);
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            
         }
 
         [HttpGet]
