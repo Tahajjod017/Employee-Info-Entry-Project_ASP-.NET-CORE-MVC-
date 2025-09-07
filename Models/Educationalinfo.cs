@@ -10,7 +10,7 @@ namespace EmployeeMvc.Models
         [Key]
         public int EducationalinfoID { get; set; }
         [ForeignKey("Employeeinfo")]
-        public string EmployeeID { get; set; }
+        public string? EmployeeID { get; set; }
 
         public int AutoId { get; set; }
         [StringLength(100)]

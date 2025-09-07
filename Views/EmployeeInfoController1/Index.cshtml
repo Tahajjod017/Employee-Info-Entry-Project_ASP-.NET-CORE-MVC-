@@ -399,19 +399,21 @@
 													<th style="width:30%;">Institution</th>
 													<th style="width:15%;">Result</th>
 													<th style="width:15%">Passing Year</th>
-													<th style="width:15%">Action</th>
+													<th style="width:15%">
+														Action
+														<button type="button" class="btn btn-success btn-sm" onclick="showEducationInputRow()" style="padding:2px 6px; font-size:12px; margin-left:6px;">+</button>
+													</th>
 												</tr>
 											</thead>
 											<tbody id="EducationinfoTableBody">
-												<tr>
+												<tr id="EducationInputRow" style="display:none" data-row-type="input">
 													<td><input type="text" class="form-control form-control-sm" placeholder="Enter exam title" /></td>
 													<td><input type="text" class="form-control form-control-sm" placeholder="Enter institution" /></td>
 													<td><input type="text" class="form-control form-control-sm" placeholder="Result" /></td>
 													<td><input type="number" class="form-control form-control-sm" placeholder="Year" min="2000" max="2030" /></td>
-
 													<td>
-														<button type="button" class="btn btn-success btn-sm" id="addEduinfoBtn" onclick="addEducationinfoRow()" style="padding:2px 6px; font-size:12px;">+</button>
-														<button type="button" class="btn btn-danger btn-sm" id="removeEduinfoBtn" onclick="removeEducationinfoRow()" style="padding:2px 6px; font-size:12px;">-</button>
+														<button type="button" class="btn btn-success btn-sm" onclick="addEducationinfoRow()" style="padding:2px 6px; font-size:12px;">+</button>
+														<button type="button" class="btn btn-danger btn-sm" onclick="removeEducationinfoRow()" style="padding:2px 6px; font-size:12px;">-</button>
 													</td>
 												</tr>
 											</tbody>
@@ -756,38 +758,6 @@
 
 					});
 
-			// 		// New Function: LoadSkillsAndSelected
-			// function loadDevSkillsAndSelect(selectedSkills) {
-			// 	$.get('/EmployeeInfoController1/GetallDev', function (designations) {
-			// 		var $dropdown = $('#DevSkills');
-
-			// 		// Destroy existing multiselect
-			// 		if ($dropdown.data('multiselect')) {
-			// 			$dropdown.multiselect('destroy');
-			// 		}
-
-			// 		// Clear and reload options
-			// 		$dropdown.empty();
-			// 		$.each(designations, function (i, item) {
-			// 			$dropdown.append($('<option>', {
-			// 				value: item.devId,
-			// 				text: item.devName
-			// 			}));
-			// 		});
-
-			// 		// Preselect skills if provided
-			// 		if (selectedSkills && selectedSkills !== '') {
-			// 			var skillsArray = selectedSkills.split(',');
-			// 			$dropdown.val(skillsArray);
-			// 		} else {
-			// 			$dropdown.val([]);
-			// 		}
-
-			// 		// Reinitialize multiselect
-			// 		$dropdown.multiselect('refresh');
-			// 	});
-			// }
-
 
 				// function submitForm WithAjax() {
 					$('#employeeForm').on('submit', function(e) {
@@ -832,64 +802,71 @@
 					}
 
 
+		// Submit form
 
-					//Save Submit Function
+				function submitForm() {
+			const formData = new FormData($('#employeeForm')[0]);
 
-									function submitForm() {
-				const formData = new FormData($('#employeeForm')[0]);
+			// Add Dev Skills
+			var selectedDevSkills = $('#DevSkills').val();
+			if (selectedDevSkills && selectedDevSkills.length > 0) {
+				$.each(selectedDevSkills, function (index, value) {
+					formData.append('selectedDevSkills', value);
+				});
+			}
 
-				// Get selected development skills from multiselect
-				var selectedDevSkills = $('#DevSkills').val();
-				if (selectedDevSkills && selectedDevSkills.length > 0) {
-					$.each(selectedDevSkills, function (index, value) {
-						formData.append('selectedDevSkills', value);
+			// Collect Education Records
+			let educationRecords = [];
+			$("#EducationinfoTableBody tr[data-row-type='data']").each(function () {
+				let examTitle = $(this).find("td:eq(0)").text().trim();
+				let institution = $(this).find("td:eq(1)").text().trim();
+				let result = $(this).find("td:eq(2)").text().trim();
+				let passingYear = $(this).find("td:eq(3)").text().trim();
+
+				if (examTitle && institution) {
+					educationRecords.push({
+						ExamTitle: examTitle,
+						Institution: institution,
+						Result: result,
+						PassingYear: passingYear
 					});
 				}
+			});
 
-				// Add all education record hidden inputs to FormData
-				// (This works if your education table hidden inputs are inside the #employeeForm)
+			// // Append JSON string
+			// formData.append("EducationRecordsJson", JSON.stringify(educationRecords));
 
-				$('#EducationinfoTableBody input[type="hidden"]').each(function() {
-
-					if ($(this).attr('name') && $(this).val()) {
-						formData.append($(this).attr('name'), $(this).val());
+			$.ajax({
+				url: '/EmployeeInfoController1/Save',
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function (response) {
+					if (response.success) {
+						alert("Saved Successfully!");
+						clear();
+						setTimeout(() => location.reload(), 500);
+					} else {
+						alert("Error: " + response.message);
+						console.log("Validation errors:", response.errors);
 					}
-				});
-				$.ajax({
-					url: '/EmployeeInfoController1/Save',
-					type: 'POST',
-					data: formData,
-					processData: false,
-					contentType: false,
-					success: function (response) {
-						console.log('Success:', response);
-						if (response.success) {
-							alert('Saved Successfully!');
-							clear();
-							location.reload(); // Page refresh
-						} else {
-							alert('Error: ' + response.message);
-							if (response.error) {
-								console.log('Validation errors:', response.errors);
-							}
-						}
-					},
-					error: function (xhr, status, error) {
-						console.error('Error:', error);
-						alert('Error saving employee: ' + xhr.responseText);
-						console.log(xhr.responseText);
-						try {
-							var errorResponse = JSON.parse(xhr.responseText);
-							alert('Error saving employee: ' + (errorResponse.message || error));
-						} catch (e) {
-							alert('Error saving employee: ' + error);
-						}
-					}
-				});
-			 }
+				},
+				error: function (xhr, status, error) {
+					console.error("Error:", error);
+					console.error("Response:", xhr.responseText);
+				}
+			});
+		}
 
-						// Edit Button click handler
-		$('#employeeTable').on('click', '.editBtn', function () {
+
+
+
+		// Global variable for tracking row indices
+		let educationRowIndex = 0;
+
+		// Edit Button click handler
+							$('#employeeTable').on('click', '.editBtn', function () {
 			var employeeId = $(this).data('id');
 			$.ajax({
 				url: '/EmployeeInfoController1/GetById',
@@ -918,10 +895,14 @@
 						$('#Phone').val(data.phone);
 						$('#Email').val(data.email);
 					}
-					// Clear existing educational records
-					clearAllEducationData();
+
+					// Clear existing educational records and populate new ones
+					// The clearAllEducationData() is called inside populateEducationalRecords()
 					if (data.educationalRecords && data.educationalRecords.length > 0) {
 						populateEducationalRecords(data.educationalRecords);
+					} else {
+						// If no educational records, just clear everything
+						clearAllEducationData();
 					}
 				},
 				error: function () {
@@ -930,169 +911,131 @@
 			});
 		});
 
-				// Function to populate educational records in the table
-		function populateEducationalRecords(educationalRecords) {
-			console.log('Populating educational records:', educationalRecords);
+		// Initialize on page load
+		$(document).ready(function () {
+			// Make sure educationRowIndex is initialized
+			if (typeof educationRowIndex === 'undefined') {
+				window.educationRowIndex = 0;
+			}
 
+			$('#EducationinfoTableBody').on('keypress', 'input', function (e) {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					addEducationinfoRow();
+				}
+			});
+			// updateRemoveButton();
+		});
+
+
+		// Function to populate educational records for editing
+								 function populateEducationalRecords(educationalRecords) {
 			educationalRecords.forEach(function (record, index) {
-				const examTitle = record.examTitle || '';
+				const examTitle   = record.examTitle   || '';
 				const institution = record.institution || '';
-				const result = record.result || '';
+				const result      = record.result      || '';
 				const passingYear = record.passingYear || '';
 
-				// Editable row instead of plain text
-				const $newRow = $(`
+				const employeeID = $('#EmployeeID').val() || '';
+				const $dataRow = $(`
 					<tr data-row-type="data" data-index="${index}">
 						<td>
-							<input type="text" class="form-control"
-								name="EducationRecords[${index}].ExamTitle"
-								value="${examTitle}" placeholder="Enter exam title" />
+							<input type="text" class="form-control form-control-sm"
+								   name="EducationRecords[${index}].ExamTitle" value="${examTitle}" />
 							<input type="hidden" name="EducationRecords[${index}].EducationalinfoID" value="${record.educationalinfoID || 0}" />
 							<input type="hidden" name="EducationRecords[${index}].AutoId" value="${record.autoId || 0}" />
+							<input type="hidden" name="EducationRecords[${index}].EmployeeID" value="${employeeID}" />
 						</td>
-						<td>
-							<input type="text" class="form-control"
-								name="EducationRecords[${index}].Institution"
-								value="${institution}" placeholder="Enter institution" />
-						</td>
-						<td>
-							<input type="text" class="form-control"
-								name="EducationRecords[${index}].Result"
-								value="${result}" placeholder="Result" />
-						</td>
-						<td>
-							<input type="text" class="form-control"
-								name="EducationRecords[${index}].PassingYear"
-								value="${passingYear}" placeholder="Year" />
-						</td>
+						<td><input type="text" class="form-control form-control-sm"
+								   name="EducationRecords[${index}].Institution" value="${institution}" /></td>
+						<td><input type="text" class="form-control form-control-sm"
+								   name="EducationRecords[${index}].Result" value="${result}" /></td>
+						<td><input type="number" class="form-control form-control-sm"
+								   name="EducationRecords[${index}].PassingYear" value="${passingYear}" /></td>
 						<td class="text-center">
 							<button type="button" class="btn btn-danger btn-sm"
-								onclick="removeDataRow(this)"
-								style="padding:2px 6px; font-size:12px;">×</button>
+									onclick="removeDataRow(this)" style="padding:2px 6px; font-size:12px;">×</button>
 						</td>
 					</tr>
 				`);
 
-				// Insert before the input row (last row)
-				const $inputRow = $('#EducationinfoTableBody tr:last-child');
-				$newRow.insertBefore($inputRow);
+				// Insert before the (hidden) input row to keep it last
+				const $inputRow = $('#EducationInputRow');
+				$dataRow.insertBefore($inputRow);
 			});
 
-			educationRowIndex = educationalRecords.length; // Update index
-			updateRemoveButton();
-		}
-
-
-		// Enhanced addEducationRow function to handle both new and edit scenarios
-		function addEducationRow() {
-			const $inputRow = $('#EducationinfoTableBody tr:last-child');
-			const examTitle = $inputRow.find('input[placeholder="Enter exam title"]').val().trim();
-			const institution = $inputRow.find('input[placeholder="Enter institution"]').val().trim();
-			const result = $inputRow.find('input[placeholder="Result"]').val().trim();
-			const passingYear = $inputRow.find('input[placeholder="Year"]').val();
-
-			// Validation
-			if (!examTitle || !institution) {
-				alert('Please enter Exam Title and Institution');
-				return;
-			}
-
-			// Create New Row
-			const $newRow = $(`
-				<tr data-row-type="data" data-index="${educationRowIndex}">
-					<td>
-						${examTitle}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].ExamTitle" value="${examTitle}" />
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].EducationalinfoID" value="0" />
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].AutoId" value="0" />
-					</td>
-					<td>
-						${institution}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].Institution" value="${institution}" />
-					</td>
-					<td>
-						${result}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].Result" value="${result ? parseFloat(result) : ''}" />
-					</td>
-					<td>
-						${passingYear}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].PassingYear" value="${passingYear ? parseInt(passingYear) : ''}" />
-					</td>
-					<td class="text-center">
-						<button type="button" class="btn btn-danger btn-sm" onclick="removeDataRow(this)" style="padding:2px 6px; font-size:12px;">×</button>
-					</td>
-				</tr>
-			`);
-
-			$newRow.insertBefore($inputRow);
-			educationRowIndex++;
-			clearEducationInputs();
-			updateRemoveButton();
+			educationRowIndex = educationalRecords.length;
+			hideEducationInputRow();   // << make sure the blank row is NOT visible after edit populate
 		}
 
 
 
 
-					//Delete Btn Functionality
+		//Delete Btn Functionality
+		$('#deleteBtn').click(function () {
+			var ids = [];
+			$('.selectsingle:checked').each(function () {
+				ids.push($(this).val());
+				console.log(ids);
+			});
 
-					$('#deleteBtn').click(function () {
-						var ids = [];
-						$('.selectsingle:checked').each(function () {
-							ids.push($(this).val());
-							console.log(ids);
-						});
-						if (ids.length == 0) {
-							var employeeId = $('#AutoID').val();
-							if (employeeId && employeeId.trim() !== '') {
-								if (confirm('Are you sure you want to delete this employee?')) {
-									$.ajax({
-										url: '/EmployeeInfoController1/Delete',
-										type: 'POST',
-										data: { id: employeeId },
-										success: function (response) {
-											if (response.success) {
-												$('#row_' + employeeId).remove();
-												alert('Employee Deleted successfully');
-												 location.reload();
-												$('#employeeForm')[0].reset();
-											} else {
-												alert('Error deleting employee');
-											}
-										},
-										error: function () {
-											alert('Error deleting employee');
-										}
-									});
+			if (ids.length == 0) {
+				var employeeId = $('#EmployeeID').val();
+				if (employeeId && employeeId.trim() !== '') {
+					if (confirm('Are you sure you want to delete this employee?')) {
+						$.ajax({
+							url: '/EmployeeInfoController1/Delete',
+							type: 'POST',
+							data: { id: employeeId },
+							success: function (response) {
+								if (response.success) {
+									$('#row_' + employeeId).remove();
+									alert('Employee Deleted successfully');
+									location.reload();
+									$('#employeeForm')[0].reset();
+								} else {
+									alert('Error deleting employee: ' + (response.message || 'Unknown error'));
 								}
+							},
+							error: function (xhr, status, error) {
+								console.error('Delete error:', xhr.responseText);
+								alert('Error deleting employee: ' + error);
+							}
+						});
+					}
+				} else {
+					alert('Please select an employee to delete');
+				}
+			} else {
+				if (confirm('Are you sure you want to delete ' + ids.length + ' employees?')) {
+					$.ajax({
+						url: '/EmployeeInfoController1/BulkDelete',
+						type: 'POST',
+						contentType: 'application/json',
+						data: JSON.stringify(ids),
+						success: function (response) {
+							if (response.success) {
+								alert('Employees deleted successfully');
+								location.reload();
 							} else {
-								alert('Please select an employee to delete');
+								alert('Error deleting employees: ' + (response.message || 'Unknown error'));
 							}
-						} else {
-							if (confirm('Are you sure you want to delete this ' + ids.length + ' employees?')) {
-								$.ajax({
-									url: '/EmployeeInfoController1/BulkDelete',
-									type: 'POST',
-									contentType: 'application/json',
-									data: JSON.stringify(ids),
-									success: function (response) {
-										if (response.success) {
-											alert('Employees deleted successfully');
-											location.reload();
-										}
-									},
-									error: function () {
-										alert('Error detecting while deleting employees');
-									}
-								});
-							}
+						},
+						error: function (xhr, status, error) {
+							console.error('Bulk delete error:', xhr.responseText);
+							alert('Error deleting employees: ' + error);
 						}
 					});
+				}
+			}
+		});
 
-					$('#selectAll').on ('click',function(){
-						var isChecked = $(this).prop('checked');
-						console.log(isChecked);
-						$('.selectsingle').prop('checked',isChecked);
-					});
+		$('#selectAll').on('click', function(){
+			var isChecked = $(this).prop('checked');
+			console.log(isChecked);
+			$('.selectsingle').prop('checked', isChecked);
+		});
+
 
 		//Function Paginated Tables
 
@@ -1116,7 +1059,7 @@
 						searchable: false,
 						className: 'text-center align-middle',
 						render: function (_, __, row) {
-						  return `<input type="checkbox" class="selectsingle" name="selectedItems" value="${row.autoID}" />`;
+						  return `<input type="checkbox" class="selectsingle" name="selectedItems" value="${row.employeeID}" />`;
 						}
 					  },
 					  { data: 'employeeID',className:'text-center align-middle' },
@@ -1206,108 +1149,97 @@
 			});
 
 
+
+
 			//Functionality of Master Table
-			let educationRowIndex = 0;
+			
+			// Show the hidden input row
+		function showEducationInputRow() {
+			$('#EducationInputRow').show();
+		}
 
-			function addEducationinfoRow() {
-				const $inputRow = $('#EducationinfoTableBody tr:last-child');
-				const examTitle = $inputRow.find('input[placeholder="Enter exam title"]').val().trim();
-				const institution = $inputRow.find('input[placeholder="Enter institution"]').val().trim();
-				const result = $inputRow.find('input[placeholder="Result"]').val().trim();
-				const passingYear = $inputRow.find('input[placeholder="Year"]').val();
+		// Hide/cancel the input row
+		function hideEducationInputRow() {
+			$('#EducationInputRow').hide().find('input').val('');
+		}
 
-				// Validation
-				if (!examTitle || !institution) {
-					alert('Please enter Exam Title and Institution');
-					return;
-				}
+		// For the "-" button on the input row
+		function removeEducationinfoRow() {
+			hideEducationInputRow();
+		}
+		// Remove btn function
+				function removeDataRow(btn) {
+			$(btn).closest('tr').remove();
+		}
 
-				// Create new data row
-								const $newRow = $(`
-				<tr data-row-type="data" data-index="${educationRowIndex}">
-					<td>
-						${examTitle}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].ExamTitle" value="${examTitle}" />
-					</td>
-					<td>
-						${institution}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].Institution" value="${institution}" />
-					</td>
-					<td>
-						${result}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].Result" value="${result ? parseFloat(result) : ''}" />
-					</td>
-					<td>
-						${passingYear}
-						<input type="hidden" name="EducationRecords[${educationRowIndex}].PassingYear" value="${passingYear ? parseInt(passingYear) : ''}" />
-					</td>
-					<td class="text-center">
-						<button type="button" class="btn btn-danger btn-sm" onclick="removeDataRow(this)" style="padding:2px 6px; font-size:12px;">×</button>
-					</td>
-				</tr>
-			`);
 
-				$newRow.insertBefore($inputRow);
-				educationRowIndex++;
-				clearEducationInputs();
-				updateRemoveButton();
-			}
+		// Add a new education row from the input row (no extra blank row left)
+				function addEducationinfoRow() {
+		const examTitle = $('#EducationInputRow td:eq(0) input').val().trim();
+		const institution = $('#EducationInputRow td:eq(1) input').val().trim();
+		const result = $('#EducationInputRow td:eq(2) input').val().trim();
+		const passingYear = $('#EducationInputRow td:eq(3) input').val().trim();
 
+		if (!examTitle || !institution) {
+			alert("Exam Title and Institution are required.");
+			return;
+		}
+
+		const row = `
+			<tr data-row-type="data">
+				<td><input type="text" class="form-control form-control-sm"
+						   name="EducationRecords[${educationRowIndex}].ExamTitle"
+						   value="${examTitle}" /></td>
+				<td><input type="text" class="form-control form-control-sm"
+						   name="EducationRecords[${educationRowIndex}].Institution"
+						   value="${institution}" /></td>
+				<td><input type="text" class="form-control form-control-sm"
+						   name="EducationRecords[${educationRowIndex}].Result"
+						   value="${result}" /></td>
+				<td><input type="number" class="form-control form-control-sm"
+						   name="EducationRecords[${educationRowIndex}].PassingYear"
+						   value="${passingYear}" /></td>
+				<td>
+					<button type="button" class="btn btn-danger btn-sm"
+		onclick="$(this).closest('tr').remove()">×</button>
+
+				</td>
+			</tr>
+		`;
+
+				$('#EducationinfoTableBody').append(row);
+			educationRowIndex++;
+
+			// Clear and hide the input row
+			$('#EducationInputRow').find('input').val('');
+			$('#EducationInputRow').hide();
+		}
+
+		// Remove a data row and renumber names so MVC binding stays correct
 			function removeEducationinfoRow() {
-				const $dataRows = $('#EducationinfoTableBody tr[data-row-type="data"]');
-				if ($dataRows.length > 0) {
-					$dataRows.last().remove();
-					reindexEducationRows();
-					updateRemoveButton();
-				}
-			}
+			$('#EducationInputRow').find('input').val('');
+			$('#EducationInputRow').hide();
+		}
 
-			function removeDataRow(button) {
-				$(button).closest('tr').remove();
-				reindexEducationRows();
-				updateRemoveButton();
-			}
-
-			function clearEducationInputs() {
-				const $inputRow = $('#EducationinfoTableBody tr:last-child');
-				$inputRow.find('input').val('');
-			}
-
-			function reindexEducationRows() {
-				$('#EducationinfoTableBody tr[data-row-type="data"]').each(function (index) {
-					$(this).attr('data-index', index);
-					$(this).find('input[type="hidden"]').each(function () {
-						const name = $(this).attr('name');
-						if (name) {
-							$(this).attr('name', name.replace(/\[\d+\]/, `[${index}]`));
-						}
-					});
+		function renumberEducationIndexes() {
+			educationRowIndex = 0;
+			$('#EducationinfoTableBody tr[data-row-type="data"]').each(function () {
+				const i = educationRowIndex++;
+				$(this).attr('data-index', i);
+				$(this).find('[name^="EducationRecords["]').each(function () {
+					const newName = $(this).attr('name').replace(/EducationRecords\[\d+\]/, `EducationRecords[${i}]`);
+					$(this).attr('name', newName);
 				});
-				educationRowIndex = $('#EducationinfoTableBody tr[data-row-type="data"]').length;
-			}
-
-			function updateRemoveButton() {
-				const hasRows = $('#EducationinfoTableBody tr[data-row-type="data"]').length > 0;
-				$('#removeEduinfoBtn').prop('disabled', !hasRows);
-			}
-
-			function clearAllEducationData() {
-				$('#EducationinfoTableBody tr[data-row-type="data"]').remove();
-				clearEducationInputs();
-				educationRowIndex = 0;
-				updateRemoveButton();
-			}
-
-			// Initialize on page load
-			$(document).ready(function () {
-				$('#EducationinfoTableBody').on('keypress', 'input', function (e) {
-					if (e.key === 'Enter') {
-						e.preventDefault();
-						addEducationinfoRow();
-					}
-				});
-				updateRemoveButton();
 			});
+		}
+
+		// Clear all data rows (used before populate on Edit) and keep input row hidden
+		function clearAllEducationData() {
+			$('#EducationinfoTableBody tr[data-row-type="data"]').remove();
+			hideEducationInputRow();
+			educationRowIndex = 0;
+		}
+
 
 					//  $(document).ready(function () {
 					// 	$('#SearchEmp').on('keyup', function () {

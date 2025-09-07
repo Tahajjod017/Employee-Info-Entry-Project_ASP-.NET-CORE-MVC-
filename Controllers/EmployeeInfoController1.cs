@@ -86,10 +86,11 @@ namespace EmployeeMvc.Controllers
             return View();
 
         }
+
+
         [HttpPost]
         public async Task<IActionResult> Save(Employeeinfo employee, string[] selectedDevSkills, List<Educationalinfo> EducationRecords)
         {
-
             // Add debug logging
             if (!ModelState.IsValid)
             {
@@ -135,15 +136,6 @@ namespace EmployeeMvc.Controllers
                     await dbContext.SaveChangesAsync(); // Save to get AutoId
 
                     // Save Education Records
-                    Console.WriteLine("Education Records Count: " + (EducationRecords?.Count ?? 0));
-                    if (EducationRecords != null)
-                    {
-                        foreach (var edu in EducationRecords)
-                        {
-                            Console.WriteLine($"Exam: {edu.ExamTitle}, Institution: {edu.Institution}, Year: {edu.PassingYear}");
-                        }
-                    }
-
                     if (EducationRecords != null && EducationRecords.Count > 0)
                     {
                         foreach (var educationRecord in EducationRecords)
@@ -168,7 +160,7 @@ namespace EmployeeMvc.Controllers
                 else
                 {
                     // Update existing employee
-                    var emp = await dbContext.Employeeinfos.FindAsync(employee.AutoID);
+                    var emp = await dbContext.Employeeinfos.FindAsync(employee.EmployeeID);
                     if (emp != null)
                     {
                         if (employee.photo != null)
@@ -236,65 +228,49 @@ namespace EmployeeMvc.Controllers
             }
         }
 
-        private string? GetUploadFileName(Employeeinfo emp)
+        // ✅ Helper method to handle photo upload
+        private string GetUploadFileName(Employeeinfo employee)
         {
-            string? uniqueFileName = null;
-            if (emp.photo != null)
-            {
-                var uploadsFolder = Path.Combine(webHost.WebRootPath, "Image");
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + emp.photo.FileName;
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+            string uniqueFileName = string.Empty;
 
+            if (employee.photo != null)
+            {
+                // Generate unique filename
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(employee.photo.FileName);
+
+                // Path: wwwroot/Image
+                string uploadsFolder = Path.Combine(webHost.WebRootPath, "Image");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Save file
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    emp.photo.CopyTo(fileStream);
+                    employee.photo.CopyTo(fileStream);
                 }
             }
-            return uniqueFileName;
+
+            return "/Image/" + uniqueFileName; // return relative path
         }
+
+
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
-            var employee = await dbContext.Employeeinfos.FindAsync(id);
-            if (employee != null)
-            {
-                if (!string.IsNullOrEmpty(employee.PhotoPath))
-                {
-                    var photoPath = Path.Combine(webHost.WebRootPath, employee.PhotoPath.TrimStart('/'));
-                    if (System.IO.File.Exists(photoPath))
-                    {
-                        try
-                        {
-                            System.IO.File.Delete(photoPath);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error deleting file: {ex.Message}");
-                        }
-                    }
-                }
-                dbContext.Employeeinfos.Remove(employee);
-                await dbContext.SaveChangesAsync();
-                return Json(new { success = true, message = "Employee deleted successfully." });
-            }
-            return Json(new { success = false, message = "Employee not found!" });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> BulkDelete([FromBody] List<int> ids)
-        {
-            if (ids == null || ids.Count == 0)
-                return NotFound();
-
-            foreach (var id in ids)
+            try
             {
                 var employee = await dbContext.Employeeinfos.FindAsync(id);
                 if (employee != null)
                 {
-                    // Delete photo if exists
                     if (!string.IsNullOrEmpty(employee.PhotoPath))
                     {
-                        var photoPath = Path.Combine(webHost.WebRootPath, "Image", Path.GetFileName(employee.PhotoPath));
+                        var photoPath = Path.Combine(webHost.WebRootPath, employee.PhotoPath.TrimStart('/'));
+                        if (System.IO.File.Exists(photoPath))
                         {
                             try
                             {
@@ -307,10 +283,69 @@ namespace EmployeeMvc.Controllers
                         }
                     }
                     dbContext.Employeeinfos.Remove(employee);
+                    await dbContext.SaveChangesAsync();
+                    return Json(new { success = true, message = "Employee deleted successfully." });
+                }
+                return Json(new { success = false, message = "Employee not found!" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Delete: {ex.Message}");
+                return Json(new { success = false, message = "An error occurred while deleting the employee." });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BulkDelete([FromBody] List<string> ids)
+        {
+            try
+            {
+                if (ids == null || ids.Count == 0)
+                    return Json(new { success = false, message = "No employees selected for deletion." });
+
+                var deletedCount = 0;
+
+                foreach (var id in ids)
+                {
+                    var employee = await dbContext.Employeeinfos.FindAsync(id);
+                    if (employee != null)
+                    {
+                        // Delete photo if exists
+                        if (!string.IsNullOrEmpty(employee.PhotoPath))
+                        {
+                            var photoPath = Path.Combine(webHost.WebRootPath, employee.PhotoPath.TrimStart('/'));
+                            if (System.IO.File.Exists(photoPath))
+                            {
+                                try
+                                {
+                                    System.IO.File.Delete(photoPath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error deleting file: {ex.Message}");
+                                }
+                            }
+                        }
+                        dbContext.Employeeinfos.Remove(employee);
+                        deletedCount++;
+                    }
+                }
+
+                if (deletedCount > 0)
+                {
+                    await dbContext.SaveChangesAsync();
+                    return Json(new { success = true, message = $"{deletedCount} employees deleted successfully." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "No employees found to delete." });
                 }
             }
-            await dbContext.SaveChangesAsync();
-            return Ok(new { success = true, message = "Employees deleted successfully." });
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in BulkDelete: {ex.Message}");
+                return Json(new { success = false, message = "An error occurred while deleting employees." });
+            }
         }
 
         public async Task<IActionResult> Clear(int id)
