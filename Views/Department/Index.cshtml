@@ -1,20 +1,20 @@
-﻿
-@model List<Department>
+﻿@model List<Department>
 @{
     ViewBag.Title = "Department";
 }
 @if (TempData["SuccessMessage"] != null)
 {
     <div>
-        <div class="alert alert-success" id="SucceessMessage"
-        @TempData["SuccessMesage"]></div>
+        <div class="alert alert-success" id="SuccessMessage">
+            @TempData["SuccessMessage"]
+        </div>
     </div>
 }
 @if (TempData["ErrorMessage"] != null)
 {
- <div class="alert alert-danger" id="ErrorMessage">
-     @TempData["ErrorMessage"]
- </div>
+    <div class="alert alert-danger" id="ErrorMessage">
+        @TempData["ErrorMessage"]
+    </div>
 }
 <style>
     .custom-label {
@@ -62,7 +62,7 @@
                                 <button type="button" id="dept-clearBtn" class="btn btn-secondary me-2">Clear</button>
                             </div>
                         </div>
-                        <input type="hidden" asp-for="@(new Department().AutoId)" name="AutoID" value="0" />
+                        <input type="hidden" asp-for="@(new Department().AutoId)" name="AutoId" value="0" />
                         <div class="row mt-3">
                             <!-- Form Container with custom layout -->
                             <div class="col-12">
@@ -83,12 +83,10 @@
                         </div>
                     </form>
                     <!--Data Grid View-->
-                    <!-- 💡 You can render your department table here -->
-                    <!--Data Grid View-->
                     <div class="table section">
-                        <div class=" row mb-3">
+                        <div class="row mb-3">
                             <div class="col-md-6">
-                                <div class="aling-item-center d-flex">
+                                <div class="align-items-center d-flex">
                                     <span class="me-2">Grid Show</span>
                                     <select class="form-select" style="width:80px;">
                                         <option>10</option>
@@ -101,7 +99,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-end">
-                                    <input type="text" class="form-control" placeholder="Search" style="width:200px" />
+                                    <input type="text" class="form-control" id="SearchDepartment" placeholder="Search" style="width:200px" />
                                 </div>
                             </div>
                         </div>
@@ -119,206 +117,217 @@
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    // Auto-hide alerts after 3 seconds
+    setTimeout(function () {
+        var success = document.getElementById("SuccessMessage");
+        if (success) {
+            success.style.display = "none";
+        }
+        var error = document.getElementById("ErrorMessage");
+        if (error) {
+            error.style.display = "none";
+        }
+    }, 3000);
 
-    <script>
+    // Search functionality
+    $('#SearchDepartment').on('input', function () {
+        loadDepartmentTable();
+    });
 
-        //Loaded and Implemented Table Data//
-        function loadDepartmentTable() {
-            fetch(`/Department/Getall`)
-            .then(response=>response.json())
+    // Load and Implement Table Data
+    function loadDepartmentTable() {
+        var searchitem = $('#SearchDepartment').val();
+        fetch(`/Department/Getall?search=${encodeURIComponent(searchitem)}`)
+            .then(response => response.json())
             .then(data => {
                 showTableData(data);
-            })
-        }
-
-        function showTableData(data) {
-            const tableBody = document.getElementById('Departmenttablebody');
-            tableBody.innerHTML = ''; // Clear existing rows
-            console.log(data);
-            data.forEach(department => {
-                const row = tableBody.insertRow();
-                row.setAttribute('data-id', department.departmentId);
-
-                //Checkbox column
-                const checkboxCell = row.insertCell(0);
-                checkboxCell.className = "text-center";
-                checkboxCell.style.width = "10%";
-                checkboxCell.innerHTML = `<input type="checkbox" class="selectsingle" name="slectItems" value="${department.departmentId}" />`;
-
-                //Edit link column
-                const idCell = row.insertCell(1);
-                idCell.className ="text-center";
-                idCell.style.width ="10%";
-                idCell.innerHTML = `<a href="javascript:void(0);" class="edit-btn" data-id="${department.departmentId}">${department.departmentId}</a>`;
-
-                //Department Name
-                const nameCell = row.insertCell(2);
-                nameCell.className ="text-center";
-                nameCell.textContent = department.departmentName;
-
-                //Department ShortName
-                const shortnameCell = row.insertCell(3);
-                shortnameCell.className = "text-center";
-                shortnameCell.textContent = department.departmentShortName;
-            })
-        }
-
-        $(document).ready(function(){
-            loadDepartmentTable();
-            GetNextDepartmentId();
-            var departmentId = $('#DepartmentId').val();
-        });
-
-
-        //Save Button Working Method//
-        $('#dept-saveBtn').click(function (e) {
-            e.preventDefault();
-            //Validate form input
-            var data = {
-               DepartmentId: $('#DepartmentId').val(),
-               DepartmentName: $('#DepartmentName').val(),
-               DepartmentShortName: $('#DepartmentShortName').val(),
-               AutoId: $('#AutoId').val()
-            };
-            $.ajax({
-                url:'/Department/Save',
-                type:'POST',
-                data: data,
-                success: function (response){
-                    alert("Save Successful")
-                    reset();
-                    // GetNextDepartmentId ();
-                    // loadDepartmentTable();
-
-                    //Reset the form
-                    $('#DepartmentForm')[0].reset();
-                    if(typeof DepartmentDD === 'function'){
-                        DepartmentDD();
-                    }
-                },
-                error: function() {
-                    alert('Failed to save designation.');
-                }
             });
-        });
+    }
 
-        //GetNextId//
-        function GetNextDepartmentId() {
-            $.ajax({
-                url: '/Department/GetNextDepartmentId',
-                type: 'GET',
-                success: function (data) {
-                    console.log("Next Department ID:", data);
-                    $('#DepartmentId').val(data);
-                },
-                error: function () {
-                    alert('Failed to get next Department ID.');
+    function showTableData(data) {
+        const tableBody = document.getElementById('Departmenttablebody');
+        tableBody.innerHTML = ''; // Clear existing rows
+        console.log(data);
+        data.forEach(department => {
+            const row = tableBody.insertRow();
+            row.setAttribute('data-id', department.departmentId);
+
+            // Checkbox column
+            const checkboxCell = row.insertCell(0);
+            checkboxCell.className = "text-center";
+            checkboxCell.style.width = "10%";
+            checkboxCell.innerHTML = `<input type="checkbox" class="selectsingle" name="selectedItems" value="${department.departmentId}" />`;
+
+            // Edit link column
+            const idCell = row.insertCell(1);
+            idCell.className = "text-center";
+            idCell.style.width = "10%";
+            idCell.innerHTML = `<a href="javascript:void(0);" class="edit-btn" data-id="${department.departmentId}">${department.departmentId}</a>`;
+
+            // Department Name
+            const nameCell = row.insertCell(2);
+            nameCell.className = "text-center";
+            nameCell.textContent = department.departmentName;
+
+            // Department ShortName
+            const shortnameCell = row.insertCell(3);
+            shortnameCell.className = "text-center";
+            shortnameCell.textContent = department.departmentShortName;
+        });
+    }
+
+    $(document).ready(function(){
+        loadDepartmentTable();
+        GetNextDepartmentId();
+    });
+
+    // Save Button Working Method
+    $('#dept-saveBtn').click(function (e) {
+        e.preventDefault();
+        // Validate form input
+        var data = {
+            DepartmentId: $('#DepartmentId').val(),
+            DepartmentName: $('#DepartmentName').val(),
+            DepartmentShortName: $('#DepartmentShortName').val(),
+            AutoId: $('#AutoId').val()
+        };
+        $.ajax({
+            url: '/Department/Save',
+            type: 'POST',
+            data: data,
+            success: function (response) {
+                alert("Save Successful");
+                reset();
+                // Reset the form
+                $('#DepartmentForm')[0].reset();
+                if (typeof DepartmentDD === 'function') {
+                    DepartmentDD();
                 }
-            });
-        }
-        //Edit Button click Handler//
-        $('#departmentTable').on('click','.edit-btn',function(){
-            var departmentId = $(this).data('id');
-            //Get Department Data via AJAX
-            $.ajax({
-                url:'/Department/GetDepartment',
-                type:'GET',
-                data:{id:departmentId},
-                success:function(data){
-                    alert("ID alrady exist")
-                    //Populate the data
+            },
+            error: function () {
+                alert('Failed to save department.');
+            }
+        });
+    });
+
+    // Get Next ID
+    function GetNextDepartmentId() {
+        $.ajax({
+            url: '/Department/GetNextDepartmentId',
+            type: 'GET',
+            success: function (data) {
+                console.log("Next Department ID:", data);
+                $('#DepartmentId').val(data);
+            },
+            error: function () {
+                alert('Failed to get next Department ID.');
+            }
+        });
+    }
+
+    // Edit Button click Handler
+    $('#departmentTable').on('click', '.edit-btn', function() {
+        var departmentId = $(this).data('id');
+        // Get Department Data via AJAX
+        $.ajax({
+            url: '/Department/GetDepartment',
+            type: 'GET',
+            data: { id: departmentId },
+            success: function(data) {
+                if (data) {
+                    // Populate the data
                     $('#DepartmentId').val(data.departmentId);
                     $('#DepartmentName').val(data.departmentName);
                     $('#DepartmentShortName').val(data.departmentShortName);
                     $('#AutoId').val(data.autoId);
-                },
-                error:function(){
-                    alert('Failed to load department data.');
                 }
-            });
+            },
+            error: function() {
+                alert('Failed to load department data.');
+            }
         });
-        //Delete Button Click Hnadler
-        $('#dept-deleteBtn').click(function() {
-            var ids=[];
-            $('.selectsingle:checked').each(function (){
-                ids.push($(this).val());
-                console.log(ids);
-            });
-            if(ids.length == 0){
-                var departmentId = $('#DepartmentId').val();
-                if(departmentId && departmentId.trim()!==''){
-                    if(confirm('Are you sure you want to delete this departmentid?')){
-                     $.ajax({
-                         url:`/Department/Delete`,
-                         type:'POST',
-                         data:{id : departmentId},
-                         success: function(response){
-                             if(response.success){
-                                 $('#row_' + departmentId).remove();
-                                 alert('Department Deleted Successfully');
-                                 loadDepartmentTable();
-                                 reset();
-                                 //Reset the form
-                                 $('#DepartmentForm')[0].reset();
-                             }else{
-                                 alert('Department delete failed');
-                             }
-                         },
-                         error:function(){
-                             alert('Something happen when delete operation!');
-                         }
-                     });
+    });
 
-                    }else{
-                        alert('Please select a Department')
-                    }   
+    // Delete Button Click Handler
+    $('#dept-deleteBtn').click(function() {
+        var ids = [];
+        $('.selectsingle:checked').each(function () {
+            ids.push($(this).val());
+        });
+        console.log(ids);
+
+        if (ids.length == 0) {
+            var departmentId = $('#DepartmentId').val();
+            if (departmentId && departmentId.trim() !== '') {
+                if (confirm('Are you sure you want to delete this department?')) {
+                    $.ajax({
+                        url: `/Department/Delete`,
+                        type: 'POST',
+                        data: { id: departmentId },
+                        success: function(response) {
+                            if (response.success) {
+                                $('#row_' + departmentId).remove();
+                                alert('Department Deleted Successfully');
+                                loadDepartmentTable();
+                                reset();
+                                // Reset the form
+                                $('#DepartmentForm')[0].reset();
+                            } else {
+                                alert('Department delete failed');
+                            }
+                        },
+                        error: function() {
+                            alert('Something happened during delete operation!');
+                        }
+                    });
                 }
-            }else{
-                if(confirm('Are you sure you want to delete this' +ids.length + 'department(s)?'))
+            } else {
+                alert('Please select a Department');
+            }
+        } else {
+            if (confirm('Are you sure you want to delete ' + ids.length + ' department(s)?')) {
                 $.ajax({
-                    url:'/Department/BulkDelete',
-                    type:'POST',
-                    contentType:'application/json',
-                    data:JSON.stringify(ids),
-                    success: function(response){
-                        if(response.success)
-                        alert('Bulk Delete Successfull!');
-                         // loadDepartmentTable();
-						 reset();
+                    url: '/Department/BulkDelete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(ids),
+                    success: function(response) {
+                        alert('Bulk Delete Successful!');
+                        reset();
                     },
-                    error:function(){
-                        alert('An error occerd during Delete!')
+                    error: function() {
+                        alert('An error occurred during Delete!');
                     }
                 });
             }
-        });
-
-        //Clear Form Data//
-        $('#dept-clearBtn').on('click',function(){
-            reset();
-        });
-        function reset(){
-			$('#DepartmentForm')[0].reset();
-			GetNextDepartmentId();
-			$('#AutoId').val('0');
-			$('.selectsingle').prop('checked',false);
         }
+    });
 
-        //SelectAll Function
-        $('#selectAll').on('click',function(){
-            var isChecked = $(this).prop('checked');
-            console.log(isChecked);
-            $('.selectsingle').prop('checked',isChecked);
-        });
-    </script>
+    // Clear Form Data
+    $('#dept-clearBtn').on('click', function() {
+        reset();
+    });
 
+    function reset() {
+        $('#DepartmentForm')[0].reset();
+        GetNextDepartmentId();
+        $('#AutoId').val('0');
+        $('.selectsingle').prop('checked', false);
+        loadDepartmentTable();
+    }
 
-}
-
+    // SelectAll Function
+    $('#selectAll').on('click', function() {
+        var isChecked = $(this).prop('checked');
+        console.log(isChecked);
+        $('.selectsingle').prop('checked', isChecked);
+    });
+</script>

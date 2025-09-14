@@ -738,25 +738,33 @@
 					});
 
 
-					 $('#clearBtn').on('click',function(){
-						 clear();
-					 });
-					function clear(){
-						$('#employeeForm')[0].reset();
-						$('#AutoID').val('0');
-						GetEmployeeNextID();
-						$('#photoPlaceholder').show();
-						$('#photoPHText').show();
-						$('#photoPreview').attr('src', '').hide();
+		// Clear Button Functionality
+		$('#clearBtn').on('click', function () {
+			clear();
+		});
 
-					}
+		function clear() {
+			// Reset master form
+			$('#employeeForm')[0].reset();
+			$('#AutoID').val('0');
+			GetEmployeeNextID();
+
+			// Reset photo
+			$('#photoPlaceholder').show();
+			$('#photoPHText').show();
+			$('#photoPreview').attr('src', '').hide();
+			$('#photo').val('');
+
+			// Reset Education Records (Master-Detail)
+			clearAllEducationData();
+		}
 					$('#pic_clearBtn') .on('click',function(){
 						 $('#photoPlaceholder').show();
 						 $('#photoPHText').show();
 						$('#photoPreview').attr('src', '').hide();
 						$('#photo').val('');
-
 					});
+							
 
 
 				// function submitForm WithAjax() {
