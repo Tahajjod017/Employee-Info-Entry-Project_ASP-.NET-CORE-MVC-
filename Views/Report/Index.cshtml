@@ -136,14 +136,16 @@
             </div>
 
             <!-- Pagination Section -->
-            <div class="d-flex justify-content-between align-items-center p-4 border-top bg-light">
+            <div class="d-flex justify-content-between align-items-center p-4 border-top-lght">
                 <div class="small text-muted">
                     <span id="paginationInfo">Page 1 of 1</span>
+                    <br />
+                    <span id="resultsInfo">Showing 0 employees</span>
                 </div>
                 <div class="d-flex gap-1">
-                    <button class="btn btn-outline-secondary btn-sm disabled">Previous</button>
-                    <button class="btn btn-primary btn-sm">1</button>
-                    <button class="btn btn-outline-secondary btn-sm disabled">Next</button>
+                    <button class="btn btn-outline-secondary btn-sm"onclick="goToPreviousPage()"id="prevBtn">Previous</button>
+                    <button class="btn btn-primary btn-sm"onclick="goToPage(currentPage)" id="currentPageBtn">1</button>
+                    <button class="btn btn-outline-danger-secondary btn-sm" onclick="goToNextPage()" id="nextBtn">Next</button>
                 </div>
             </div>
         </div>
@@ -154,6 +156,8 @@
         let currentData = [];
         let currentPage = 1;
         let totalPages = 1;
+        let totalRecords = 0;
+        let pageSize = 10;
 
         // Load data on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -179,7 +183,7 @@
                 if (dateFrom) formData.append('joiningDateFrom', dateFrom);
                 if (dateTo) formData.append('joiningDateTo', dateTo);
                 if (search) formData.append('search', search);
-				formData.append('page', page);
+                formData.append('page', page);
 
                 const response = await fetch('/Report/GetFilteredEmployees', {
                     method: 'POST',
@@ -190,11 +194,14 @@
 
                 if (result.success) {
                     currentData = result.data;
-					currentPage = result.pagination.currentPage;
-					totalPages = result.pagination.totalPages;
+                    currentPage = result.pagination.currentPage;
+                    totalPages = result.pagination.totalPages;
+                    totalRecords = result.pagination.totalRecords;
+                    pageSize = result.pagination.pageSize;
 
                     populateTable(result.data);
-                    updateResultsInfo(result.data.length);
+                    updateResultsInfo(result.pagination);
+                    updatePagination(result.pagination); 
                 } else {
                     showError(result.message || 'Error loading data');
                 }
@@ -205,51 +212,64 @@
                 showLoading(false);
             }
         }
-        //Update Pagination
-               function updatePagination(pagination) {
-            // Update pagination display
-            const pageInfo = document.querySelector('.pagination-info');
-            if (pageInfo) {
-                pageInfo.textContent = `Page ${pagination.currentPage} of ${pagination.totalPages}`;
+
+        // Fixed pagination update function
+        function updatePagination(pagination) {
+            // Update pagination info
+            const paginationInfo = document.getElementById('paginationInfo');
+            if (paginationInfo) {
+                paginationInfo.textContent = `Page ${pagination.currentPage} of ${pagination.totalPages}`;
             }
 
-            // Update pagination buttons
-            const prevBtn = document.getElementById('prevBtn') || document.querySelector('.btn:contains("Previous")');
-            const nextBtn = document.getElementById('nextBtn') || document.querySelector('.btn:contains("Next")');
-            const currentPageSpan = document.querySelector('.current-page') || document.querySelector('span:contains("1")');
-
+            // Update Previous button
+            const prevBtn = document.getElementById('prevBtn');
             if (prevBtn) {
                 prevBtn.disabled = !pagination.hasPrevious;
-                prevBtn.onclick = () => pagination.hasPrevious ? applyFilters(pagination.currentPage - 1) : null;
+                if (pagination.hasPrevious) {
+                    prevBtn.classList.remove('disabled');
+                } else {
+                    prevBtn.classList.add('disabled');
+                }
             }
 
+            // Update Next button
+            const nextBtn = document.getElementById('nextBtn');
             if (nextBtn) {
                 nextBtn.disabled = !pagination.hasNext;
-                nextBtn.onclick = () => pagination.hasNext ? applyFilters(pagination.currentPage + 1) : null;
+                if (pagination.hasNext) {
+                    nextBtn.classList.remove('disabled');
+                } else {
+                    nextBtn.classList.add('disabled');
+                }
             }
 
-            if (currentPageSpan) {
-                currentPageSpan.textContent = pagination.currentPage;
+            // Update current page number
+            const currentPageBtn = document.getElementById('currentPageBtn');
+            if (currentPageBtn) {
+                currentPageBtn.textContent = pagination.currentPage;
+                currentPageBtn.onclick = () => goToPage(pagination.currentPage);
             }
         }
-        //Add Navigation Function
-                function goToPage(page) {
+
+        // Navigation functions
+        function goToPage(page) {
             if (page >= 1 && page <= totalPages) {
                 applyFilters(page);
             }
         }
-        function goToPreviousPage() {
-			if(currentPage > 1){
-				applyFilters(currentPage - 1);
-			}
-        }
 
-        function goToNextPage(){
-			if (currentPage < totalPages) {
-				applyFilters(currentPage + 1);
+        function goToPreviousPage() {
+            if (currentPage > 1) {
+                applyFilters(currentPage - 1);
+
             }
         }
 
+        function goToNextPage() {
+            if (currentPage < totalPages) {
+                applyFilters(currentPage + 1);
+            }
+        }
 
         function populateTable(employees) {
             const tbody = document.getElementById('employeeTableBody');
@@ -277,7 +297,7 @@
                     <td>${emp.joiningDate}</td>
                     <td>${emp.phone || ''}</td>
                     <td>${emp.email || ''}</td>
-                    <td>${emp.grossSalary ? '$' + emp.grossSalary.toLocaleString() : ''}</td>
+                    <td>${emp.grossSalary ? '' + emp.grossSalary.toLocaleString() : ''}</td>
                     <td>
                         ${emp.photoPath
                             ? `<img src="${emp.photoPath}" alt="Photo" class="photo-thumbnail" onerror="this.style.display='none'">`
@@ -293,9 +313,12 @@
             `).join('');
         }
 
-        function updateResultsInfo(count) {
+        function updateResultsInfo(pagination) {
             const info = document.getElementById('resultsInfo');
-            info.innerHTML = `<span class="small text-muted">Showing ${count} employee${count !== 1 ? 's' : ''}</span>`;
+            const startRecord = ((pagination.currentPage - 1) * pagination.pageSize) + 1;
+            const endRecord = Math.min(pagination.currentPage * pagination.pageSize, pagination.totalRecords);
+
+            info.innerHTML = `<span class="small text-muted">Showing ${startRecord}-${endRecord} of ${pagination.totalRecords} employee${pagination.totalRecords !== 1 ? 's' : ''}</span>`;
         }
 
         function resetFilters() {
@@ -304,7 +327,7 @@
             document.getElementById('joiningDateTo').value = '';
             document.getElementById('searchEmployee').value = '';
 
-            currentPage = 1; //Reset to first page
+            currentPage = 1; // Reset to first page
             applyFilters();
         }
 
