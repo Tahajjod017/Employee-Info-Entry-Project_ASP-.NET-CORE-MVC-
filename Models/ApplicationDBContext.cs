@@ -11,6 +11,11 @@ namespace EmployeeMvc.Models
         public DbSet<Designation> Designations { get; set; }
         public DbSet<Devskill> Devskills { get; set; }
         public DbSet<Educationalinfo> Educationalinfos { get; set; }
+        //public DbSet<HRM_ATD_RosterScheduleEntry> HRM_ATD_RosterScheduleEntries { get; set; }
+        public DbSet<HRMATDRosterScheduleEntry> HRMATDRosterScheduleEntries { get; set; }
+        public DbSet<HRMDefDesignation> HRMDefDesignations { get; set; }
+        public DbSet<HRMEmployee> HRMEmployees { get; set; }
+        public DbSet<HRMATDShift> HRMATDShifts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

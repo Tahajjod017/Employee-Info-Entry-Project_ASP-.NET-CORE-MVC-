@@ -249,6 +249,74 @@ namespace EmployeeMvc.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ExportToPDF(string? department, DateTime? joiningDateFrom, DateTime? joiningDateTo, string? search)
+        {
+            try
+            {
+                var employees = await GetEmployeesForExport(department, joiningDateFrom, joiningDateTo, search);
+
+                using (var stream = new MemoryStream())
+                {
+                    var document = new Document(PageSize.A4.Rotate(), 10, 10, 10, 10);
+                    PdfWriter.GetInstance(document, stream);
+                    document.Open();
+
+                    // Title
+                    var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+                    document.Add(new Paragraph("Employee Information Report", titleFont));
+                    document.Add(new Paragraph(" ")); // Empty line
+
+                    // Table
+                    var table = new PdfPTable(12);
+                    table.WidthPercentage = 100;
+
+                    // Headers
+                    var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8);
+                    table.AddCell(new PdfPCell(new Phrase("Sl No.", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Employee ID", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Name", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Address", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Designation", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Department", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Skills", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Joining Date", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Phone", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Email", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Salary", headerFont)));
+                    table.AddCell(new PdfPCell(new Phrase("Education", headerFont)));
+
+                    // Data
+                    var cellFont = FontFactory.GetFont(FontFactory.HELVETICA, 7);
+                    for (int i = 0; i < employees.Count; i++)
+                    {
+                        var emp = employees[i];
+                        table.AddCell(new PdfPCell(new Phrase((i + 1).ToString(), cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(emp.EmployeeID, cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(emp.Name, cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(emp.Address ?? "", cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(emp.Designation, cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(emp.Department, cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(GetDevSkillsNames(emp.DevSkills), cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(emp.JoiningDate?.ToString("dd-MM-yyyy") ?? "", cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(emp.Phone ?? "", cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(emp.Email ?? "", cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase((emp.GrossSalary ?? 0).ToString(), cellFont)));
+                        table.AddCell(new PdfPCell(new Phrase(emp.EducationalInfo ?? "", cellFont)));
+                    }
+
+                    document.Add(table);
+                    document.Close();
+
+                    return File(stream.ToArray(), "application/pdf", $"EmployeeReport_{DateTime.Now:yyyyMMdd}.pdf");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "PDF export failed: " + ex.Message });
+            }
+        }
+
         private async Task<List<dynamic>> GetEmployeesForExport(string? department, DateTime? joiningDateFrom, DateTime? joiningDateTo, string? search)
         {
             var query = from emp in dbContext.Employeeinfos
