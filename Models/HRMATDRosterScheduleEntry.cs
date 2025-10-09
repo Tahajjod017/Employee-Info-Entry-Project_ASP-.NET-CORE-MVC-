@@ -24,5 +24,6 @@ namespace EmployeeMvc.Models
 
         public DateTime? EntryDate { get; set; }
         public DateTime? ModifyDate { get; set; }
+        //public string EmployeeName { get; internal set; }
     }
 }

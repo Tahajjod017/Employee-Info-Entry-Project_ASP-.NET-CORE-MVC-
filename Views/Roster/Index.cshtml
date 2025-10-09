@@ -12,6 +12,12 @@
 		display: flex !important;
 	}
 </style>
+<link href="https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/styles/choices.min.css" rel="stylesheet">
+
+<!--Multiselect CDN-->
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+
 
 <div class="container-fluid">
 	<div class="row">
@@ -81,12 +87,13 @@
 						<div class="d-flex align-items-center">
 							<strong class="me-2">Roster Schedule Entry Data:</strong>
 						</div>
-						<div class="row align-items-end g-3">
+
+						<div class="row align-items-end g-3 mb-lg-3"> <!--First Row-->
 							<div class="d-flex align-items-center gap-3 w-100">
 								<!-- Name Dropdown -->
 								<div class="d-flex flex-column" style="flex: 1;">
 									<label class="form-label fw-medium mb-1 small">Name</label>
-									<select class="form-select form-select-sm" id="nameFilter">
+									<select class="form-select form-select-sm" id="nameFilter" name="SelectedNames" multiple>
 										<option value="">All</option>
 										@if (ViewBag.Employess != null)
 										{
@@ -128,19 +135,28 @@
 						</div>
 
 						<!--Show Entries-->
-						<div class=" row align-items-end"> 
-							<div class="col-md-3 mb-2">
-								<div class="d-flex align-items-center gap-2 mt-2">
-									<span>Show</span>
-									<select class="form-select form-select-sm w-auto" id="entriesPage">
+						<div class="d-flex align-items-center justify-content-start gap-3 mb-3">
+							<div id="entriesPageWarpper" class="dataTables_length">
+								<label class="mb-0">
+									Show
+									<select id="entriesPage" class="form-select form-select-sm d-inline-block w-auto">
 										<option value="10">10</option>
 										<option value="25">25</option>
 										<option value="50">50</option>
 										<option value="100">100</option>
 									</select>
-									<span>entries</span>
-								</div>
+									entries
+								</label>
 							</div>
+							<!--Input for showing request-->
+							<div>
+								<input type="text" id="requestTimeInput"
+									   class="form-control form-control-sm"
+									   style="width:150px;"
+									   placeholder="Request time"
+									   readonly />
+							</div>
+
 							<!--Loading Live Indecator-->
 							<div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center"
 								 style="background: rgba(0, 0, 0, 0.5); z-index: 9999;">
@@ -155,7 +171,8 @@
 								</div>
 							</div>
 
-							<div class="col-md-9 justify-content-end d-flex ">
+							<!--Search-->
+							<div class="col-md-8 justify-content-end d-flex ">
 								<div class="pe-1">
 									<label class="form-label fw-medium mb-1 small text-start">Search</label>
 								</div>
@@ -165,7 +182,7 @@
 										   class="form-control form-control-sm"
 										   id="rosterSearch"
 										   placeholder="Search in roster data" />
-								</div> 
+								</div>
 							</div>
 						</div>
 					</div>
@@ -227,6 +244,12 @@
 
 @section Scripts {
 	<script src="~/js/roster.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/scripts/choices.min.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+	
+
 }
 
 

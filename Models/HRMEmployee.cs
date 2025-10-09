@@ -17,5 +17,7 @@ namespace EmployeeMvc.Models
         public string Name { get; set; }
         [StringLength(50)]
         public string DesignationCode { get; set; }
+
+        //public object EmployeeName { get; internal set; }
     }
 }
